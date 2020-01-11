@@ -1,13 +1,26 @@
 package org.neurobrain.tlozbotw.entity;
 
-import java.io.Serializable;
-import java.util.List;
-
-import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+
+import java.io.Serializable;
+import java.util.List;
 import org.neurobrain.tlozbotw.util.Text;
+
 
 @Entity
 @Table(name = "users")
@@ -38,9 +51,9 @@ public class User implements Serializable {
 	@Column(columnDefinition = "boolean default false")
 	private boolean delete;
 
-	@ManyToMany(fetch=FetchType.LAZY, cascade=CascadeType.ALL)
+	@ManyToMany(fetch= FetchType.LAZY, cascade= CascadeType.ALL)
 	@JoinTable(
-		name = "user_role", joinColumns = @JoinColumn(name = "user_id"), 
+		name = "user_role", joinColumns = @JoinColumn(name = "user_id"),
 		inverseJoinColumns = @JoinColumn(name="role_id"),
 		uniqueConstraints = { @UniqueConstraint(columnNames = {"user_id", "role_id"}) }
 	)
@@ -162,12 +175,6 @@ public class User implements Serializable {
 		this.userBows = userBows;
 	}
 
-
-	@Override
-	public String toString() {
-		return Text.toJSONString(this);
-	}
-
 	public boolean containsRole(String roleStg) {
 		for (Role role: roles) {
 			if (role.getName().equals("ROLE_" + roleStg)) {
@@ -175,6 +182,11 @@ public class User implements Serializable {
 			}
 		}
 		return false;
+	}
+
+	@Override
+	public String toString() {
+		return Text.toJSONString(this);
 	}
 
 }

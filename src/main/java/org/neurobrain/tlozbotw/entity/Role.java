@@ -2,11 +2,18 @@ package org.neurobrain.tlozbotw.entity;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import org.neurobrain.tlozbotw.util.Text;
+
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.ManyToMany;
+import javax.persistence.Table;
 
 import java.io.Serializable;
 import java.util.List;
 
-import javax.persistence.*;
 
 @Entity
 @Table(name = "role")
@@ -48,10 +55,9 @@ public class Role implements Serializable {
 		this.name = name;
 	}
 
-
 	@Override
 	public String toString() {
-		return "Reference[Properties other than lodger=" + id + "]";
+		return Text.toJSONString(this);
 	}
 
 }

@@ -3,9 +3,19 @@ package org.neurobrain.tlozbotw.entity;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
-import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+
 import java.io.Serializable;
 import java.util.List;
+import org.neurobrain.tlozbotw.util.Text;
+
 
 @Entity
 @Table(name = "bow")
@@ -95,9 +105,9 @@ public class Bow implements Serializable {
 		this.userBows = userBows;
 	}
 
-	/*@Override
+	@Override
 	public String toString() {
 		return Text.toJSONString(this);
-	}*/
+	}
 
 }

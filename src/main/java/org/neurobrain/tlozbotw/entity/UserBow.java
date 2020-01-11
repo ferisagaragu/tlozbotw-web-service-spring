@@ -1,6 +1,13 @@
 package org.neurobrain.tlozbotw.entity;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
+import org.neurobrain.tlozbotw.util.Text;
 import java.io.Serializable;
 
 
@@ -20,6 +27,7 @@ public class UserBow implements Serializable {
 
 	@Column(columnDefinition = "boolean default true")
 	private Boolean see;
+
 
 	public User getUser() {
 		return user;
@@ -45,9 +53,9 @@ public class UserBow implements Serializable {
 		this.see = see;
 	}
 
-	/*@Override
+	@Override
 	public String toString() {
 		return Text.toJSONString(this);
-	}*/
+	}
 
 }
