@@ -121,7 +121,7 @@ public class AuthServiceImpl implements IAuthService, UserDetailsService {
 
 
 	@Override
-	@Transactional
+	@Transactional(readOnly = true)
 	public UserDetails loadUserByUsername(String userName) {
 		User user = userDao.findByUserName(userName).orElseThrow(() ->
 			new UsernameNotFoundException(userNoExist)
@@ -169,7 +169,7 @@ public class AuthServiceImpl implements IAuthService, UserDetailsService {
 
 	@Override
 	@Transactional
-	public ResponseEntity<Object> signin(Map<String, Object> req) {
+	public ResponseEntity<Object> signIn(Map<String, Object> req) {
 		String userName = request.getString(req, this.userNameRef);
 		User user = searchUserName(userName);
 		String jwt;
@@ -190,14 +190,15 @@ public class AuthServiceImpl implements IAuthService, UserDetailsService {
 			throw new UnauthorizedException(userNoPassowrd);
 		}
 		
-		return response.signinResp(jwt, user);
+		return response.signInResp(jwt, user);
 	}
 
 	@Override
 	@Transactional
 	public ResponseEntity<Object> recoverPassword(Map<String, Object> req) {
 		User userEmail = userDao.findByEmail(request.getString(req, "email"))
-			.orElseThrow(() -> new BadRequestException(userNoExist));
+			.orElseThrow(() -> new BadRequestException(userNoExist)
+		);
 
 		String password = Text.uniqueString();
 
@@ -223,14 +224,16 @@ public class AuthServiceImpl implements IAuthService, UserDetailsService {
 	@Transactional
 	public ResponseEntity<Object> changePassword(Map<String, Object> req) {
 		User userChange = userDao.findByRecoverCode(request.getString(req, "code"))
-			.orElseThrow(() -> new BadRequestException(userNoExist));
+			.orElseThrow(() -> new BadRequestException(userNoExist)
+		);
+
 		userChange.setPassword(
 			encoder.encode(
 				request.getString(req, "password")
 			)
 		);
-		userChange.setRecoverCode("");
 
+		userChange.setRecoverCode("");
 		userDao.saveAndFlush(userChange);
 		return response.changePassword(userChangePassword);
 	}
@@ -258,8 +261,7 @@ public class AuthServiceImpl implements IAuthService, UserDetailsService {
 			throw new BadRequestException(phoneNumberExist);
 		}
 	}
-	
-	
+
 	private User searchUserName(String userName) {
 		User user = userDao.findByUserName(userName).orElse(null);
 		

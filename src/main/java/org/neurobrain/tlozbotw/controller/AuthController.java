@@ -80,7 +80,7 @@ public class AuthController {
 	 	@apiGroup Auth
 		@apiVersion 0.0.1
 		@apiDescription Servicio para iniciar sesión
-		@api {post} auth/signin signin
+		@api {post} auth/signIn signIn
 		@apiPermission none
 
 		@apiParamExample {json} Request-Body:
@@ -126,12 +126,12 @@ public class AuthController {
 				"message": "your error message"
 			}
 	*/
-	@PostMapping("/signin")
-	public ResponseEntity<Object> signin(
+	@PostMapping("/signIn")
+	public ResponseEntity<Object> signIn(
 		@RequestBody Map<String, Object> req
 	) {
 		try {
-			return authService.signin(req);
+			return authService.signIn(req);
 		} catch (ResponseStatusException e) {
 			return httpExceptionResponse.error(e);
 		}
