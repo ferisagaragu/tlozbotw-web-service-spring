@@ -18,18 +18,15 @@ public class UserPrinciple implements UserDetails {
 	private static final long serialVersionUID = 1L;
  
 	private Long id;
- 
 	private String name;
- 
 	private String username;
- 
 	private String email;
- 
+ 	private Collection<? extends GrantedAuthority> authorities;
+
 	@JsonIgnore
 	private String password;
  
-	private Collection<? extends GrantedAuthority> authorities;
- 
+
 	public UserPrinciple(
 		Long id, String name, 
 		String username, String email, String password, 
@@ -42,7 +39,8 @@ public class UserPrinciple implements UserDetails {
 		this.password = password;
 		this.authorities = authorities;
 	}
- 
+
+
 	public static UserPrinciple build(User user) {
 		List<GrantedAuthority> authorities = 
 			user.getRoles().stream().map(role ->

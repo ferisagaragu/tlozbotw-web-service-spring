@@ -20,15 +20,16 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import org.neurobrain.tlozbotw.service.AuthServiceImpl;
  
 public class JwtAuthTokenFilter extends OncePerRequestFilter {
- 
+
+	private static final Logger logger = LoggerFactory.getLogger(JwtAuthTokenFilter.class);
+
 	@Autowired
 	private JwtProvider tokenProvider;
  
 	@Autowired
 	private AuthServiceImpl userDetailsService;
- 
-	private static final Logger logger = LoggerFactory.getLogger(JwtAuthTokenFilter.class);
- 
+
+
 	@Override
 	protected void doFilterInternal(
 		HttpServletRequest request, 

@@ -61,7 +61,7 @@ public class UserServiceImp implements IUserService {
 
 	@Override
 	@Transactional
-	public ResponseEntity<Object> firstSignin(Long id, Map<String, Object> req) {
+	public ResponseEntity<Object> firstSignIn(Long id, Map<String, Object> req) {
 		User user = userDao.findById(id).orElseThrow(() ->
 			new BadRequestException(userNoExist)
 		);
@@ -78,9 +78,8 @@ public class UserServiceImp implements IUserService {
 		}
 
 		userDao.save(user);
-		return response.firstSignin(userActivated);
+		return response.firstSignIn(userActivated);
 	}
-
 
 	@Override
 	@Transactional
@@ -101,7 +100,6 @@ public class UserServiceImp implements IUserService {
 		return response.updateUserResp(userUpdated, userUpdate);
 	}
 
-
 	@Override
 	@Transactional
 	public ResponseEntity<Object> blocked(Long id, Map<String, Object> req) {
@@ -119,7 +117,6 @@ public class UserServiceImp implements IUserService {
 
 		return response.blocked(userUnlocked);
 	}
-
 
 	@Override
 	@Transactional

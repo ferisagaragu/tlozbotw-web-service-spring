@@ -21,7 +21,8 @@ public class JwtProvider {
  
 	@Value("${app.auth.jwt-expiration}")
 	private int jwtExpiration;
- 
+
+
 	public String generateJwtToken(Authentication authentication) {
 		UserPrinciple userPrincipal = (UserPrinciple) authentication.getPrincipal();
 

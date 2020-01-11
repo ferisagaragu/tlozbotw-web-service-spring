@@ -22,13 +22,14 @@ import org.neurobrain.tlozbotw.service.AuthServiceImpl;
 	prePostEnabled = true
 )
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
-	
+
 	@Autowired
-	AuthServiceImpl userDetailsService;
- 
+	public AuthServiceImpl userDetailsService;
+
 	@Autowired
 	private JwtAuthEntryPoint unauthorizedHandler;
- 
+
+
 	@Bean
 	public JwtAuthTokenFilter authenticationJwtTokenFilter() {
 		return new JwtAuthTokenFilter();
@@ -51,7 +52,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	public PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
 	}
-    
+
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 		http.cors().and().csrf().disable().
