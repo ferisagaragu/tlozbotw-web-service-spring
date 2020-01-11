@@ -7,6 +7,7 @@ public class ForbiddenException extends ResponseStatusException {
 
 	private String developMessage;
 
+
 	public ForbiddenException(String reason) {
 		super(HttpStatus.FORBIDDEN, reason);
 	}

@@ -7,6 +7,7 @@ public class UnauthorizedException extends ResponseStatusException {
 
 	private String developMessage;
 
+
 	public UnauthorizedException(String reason) {
 		super(HttpStatus.UNAUTHORIZED, reason);
 	}

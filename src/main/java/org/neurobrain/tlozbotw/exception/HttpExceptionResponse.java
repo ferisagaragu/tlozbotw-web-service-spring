@@ -16,6 +16,7 @@ public class HttpExceptionResponse {
 
 	private static final Logger logger = LoggerFactory.getLogger(HttpExceptionResponse.class);
 
+
 	public ResponseEntity<Object> error(ResponseStatusException e) {
 		Map<String, Object> resp = new LinkedHashMap<>();
 		resp.put("timestamp", new Date());

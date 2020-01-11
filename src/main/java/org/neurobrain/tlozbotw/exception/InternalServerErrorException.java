@@ -7,6 +7,7 @@ public class InternalServerErrorException extends ResponseStatusException {
 
 	private String developMessage;
 
+
 	public InternalServerErrorException(String reason) {
 		super(HttpStatus.INTERNAL_SERVER_ERROR, reason);
 	}
