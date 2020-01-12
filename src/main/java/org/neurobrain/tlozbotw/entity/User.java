@@ -18,8 +18,8 @@ import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
-import org.neurobrain.tlozbotw.util.Text;
 
 
 @Entity
@@ -43,13 +43,13 @@ public class User implements Serializable {
 	private String recoverCode;
 
 	@Column(columnDefinition = "boolean default true")
-	private boolean firstSession;
+	private Boolean firstSession;
 
 	@Column(columnDefinition = "boolean default false")
-	private boolean blocked;
+	private Boolean locked;
 
-	@Column(columnDefinition = "boolean default false")
-	private boolean delete;
+	@Column(columnDefinition = "boolean default true")
+	private Boolean enabled;
 
 	@ManyToMany(fetch= FetchType.LAZY, cascade= CascadeType.ALL)
 	@JoinTable(
@@ -61,6 +61,9 @@ public class User implements Serializable {
 
 	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
 	private List<UserBow> userBows;
+
+	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+	private List<LockReason> lockReasons;
 
 
 	public Long getId() {
@@ -134,29 +137,29 @@ public class User implements Serializable {
 	public void setImageUrl(String imageUrl) {
 		this.imageUrl = imageUrl;
 	}
-	
-	public boolean isFirstSession() {
+
+	public Boolean getFirstSession() {
 		return firstSession;
 	}
 
-	public void setFirstSession(boolean firstSession) {
+	public void setFirstSession(Boolean firstSession) {
 		this.firstSession = firstSession;
 	}
 
-	public boolean isBlocked() {
-		return blocked;
+	public Boolean getLocked() {
+		return locked;
 	}
 
-	public void setBlocked(boolean blocked) {
-		this.blocked = blocked;
+	public void setLocked(Boolean locked) {
+		this.locked = locked;
 	}
 
-	public boolean isDelete() {
-		return delete;
+	public Boolean getEnabled() {
+		return enabled;
 	}
 
-	public void setDelete(boolean delete) {
-		this.delete = delete;
+	public void setEnabled(Boolean enabled) {
+		this.enabled = enabled;
 	}
 
 	public String getRecoverCode() {
@@ -175,6 +178,14 @@ public class User implements Serializable {
 		this.userBows = userBows;
 	}
 
+	public List<LockReason> getLockReasons() {
+		return lockReasons;
+	}
+
+	public void setLockReasons(List<LockReason> lockReasons) {
+		this.lockReasons = lockReasons;
+	}
+
 	public boolean containsRole(String roleStg) {
 		for (Role role: roles) {
 			if (role.getName().equals("ROLE_" + roleStg)) {
@@ -184,9 +195,12 @@ public class User implements Serializable {
 		return false;
 	}
 
-	@Override
-	public String toString() {
-		return Text.toJSONString(this);
+	public List<String> getFormatRoles() {
+		List<String> rolesOut = new ArrayList<>();
+		roles.forEach((Role role) -> {
+			rolesOut.add(role.getName());
+		});
+		return rolesOut;
 	}
 
 }

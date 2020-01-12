@@ -1,8 +1,11 @@
 package org.neurobrain.tlozbotw.service;
 
+import java.util.ArrayList;
 import java.util.Map;
 
+import org.neurobrain.tlozbotw.dao.IRoleDAO;
 import org.neurobrain.tlozbotw.dao.IUserDAO;
+import org.neurobrain.tlozbotw.entity.Role;
 import org.neurobrain.tlozbotw.entity.User;
 import org.neurobrain.tlozbotw.exception.BadRequestException;
 import org.neurobrain.tlozbotw.response.UserResp;
@@ -15,6 +18,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+
 @Service
 public class UserServiceImp implements IUserService {
 
@@ -22,6 +26,7 @@ public class UserServiceImp implements IUserService {
 	private final UserResp response;
 	private final PasswordEncoder encoder;
 	private final IUserDAO userDao;
+	private final IRoleDAO roleDao;
 	
 	@Value("${app.auth.user-no-exist}")
 	private String userNoExist;
@@ -38,8 +43,8 @@ public class UserServiceImp implements IUserService {
 	@Value("${app.auth.phone-number-exist}")
 	private String phoneNumberExist;
 
-	@Value("${app.auth.user-blocked}")
-	private String userBlockedM;
+	@Value("${app.auth.user-locked}")
+	private String userLockedM;
 
 	@Value("${app.auth.user-unlocked}")
 	private String userUnlocked;
@@ -51,11 +56,18 @@ public class UserServiceImp implements IUserService {
 	private String userWasSignin;
 
 
-	public UserServiceImp(Request request, UserResp response, PasswordEncoder encoder, IUserDAO userDao) {
+	public UserServiceImp(
+		Request request,
+		UserResp response,
+		PasswordEncoder encoder,
+		IUserDAO userDao,
+		IRoleDAO roleDao
+	) {
 		this.request = request;
 		this.response = response;
 		this.encoder = encoder;
 		this.userDao = userDao;
+		this.roleDao = roleDao;
 	}
 
 
@@ -66,7 +78,7 @@ public class UserServiceImp implements IUserService {
 			new BadRequestException(userNoExist)
 		);
 
-		if (user.isFirstSession()) {
+		if (user.getFirstSession()) {
 			user.setFirstSession(false);
 			user.setPassword(
 				encoder.encode(
@@ -77,7 +89,7 @@ public class UserServiceImp implements IUserService {
 			throw new BadRequestException(userWasSignin);
 		}
 
-		userDao.save(user);
+		userDao.saveAndFlush(user);
 		return response.firstSignIn(userActivated);
 	}
 
@@ -95,27 +107,27 @@ public class UserServiceImp implements IUserService {
 		userUpdate.setLastName(request.getString(req, "lastName"));
 		userUpdate.setImageUrl(request.getString(req, "imageUrl"));
 		userUpdate.setName(request.getString(req, "name"));
-		userDao.save(userUpdate);
+		userDao.saveAndFlush(userUpdate);
 		
 		return response.updateUserResp(userUpdated, userUpdate);
 	}
 
 	@Override
 	@Transactional
-	public ResponseEntity<Object> blocked(Long id, Map<String, Object> req) {
+	public ResponseEntity<Object> lock(Long id, Map<String, Object> req) {
 
-		boolean blocked = request.getBoolean(req, "blocked");
+		boolean locked = request.getBoolean(req, "locked");
 		User userBlocked = userDao.findById(id).orElseThrow(() ->
 			new BadRequestException(userNoExist)
 		);
-		userBlocked.setBlocked(blocked);
-		userDao.save(userBlocked);
+		userBlocked.setLocked(locked);
+		userDao.saveAndFlush(userBlocked);
 
-		if (blocked) {
-			return response.blocked(userBlockedM);
+		if (locked) {
+			return response.lock(userLockedM);
 		}
 
-		return response.blocked(userUnlocked);
+		return response.lock(userUnlocked);
 	}
 
 	@Override
@@ -124,8 +136,9 @@ public class UserServiceImp implements IUserService {
 		User userDelete = userDao.findById(id).orElseThrow(() ->
 			new BadRequestException(userNoExist)
 		);
-		userDelete.setDelete(true);
-		userDao.save(userDelete);
+		userDelete.setEnabled(false);
+		userDelete.getRoles().clear();
+		userDao.saveAndFlush(userDelete);
 
 		return response.delete(userDeleted);
 	}

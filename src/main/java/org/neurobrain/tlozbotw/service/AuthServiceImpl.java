@@ -45,6 +45,7 @@ public class AuthServiceImpl implements IAuthService, UserDetailsService {
 	private final Request request;
 	private final IUserDAO userDao;
 	private final IRoleDAO roleDao;
+	private final Text text;
  
 	@Value("${app.auth.user-no-exist}")
 	private String userNoExist;
@@ -104,7 +105,8 @@ public class AuthServiceImpl implements IAuthService, UserDetailsService {
 		AuthResp response,
 		Request request,
 		IUserDAO userDao,
-		IRoleDAO roleDao
+		IRoleDAO roleDao,
+		Text text
 	) {
 		this.authenticationManager = authenticationManager;
 		this.jwtProvider = jwtProvider;
@@ -115,6 +117,7 @@ public class AuthServiceImpl implements IAuthService, UserDetailsService {
 		this.request = request;
 		this.userDao = userDao;
 		this.roleDao = roleDao;
+		this.text = text;
 		this.userNameRef = "userName";
 		this.emailRef = "email";
 	}
@@ -135,7 +138,7 @@ public class AuthServiceImpl implements IAuthService, UserDetailsService {
 	public ResponseEntity<Object> signUp(Map<String, Object> req) {
 		existUser(req);
 		
-		String password = Text.uniqueString();
+		String password = text.uniqueString();
 		User user = new User();
 		user.setName(request.getString(req, "name"));
 		user.setLastName(request.getString(req, "lastName"));
@@ -187,7 +190,7 @@ public class AuthServiceImpl implements IAuthService, UserDetailsService {
 			user.setRecoverCode("");
 			userDao.saveAndFlush(user);
 		} catch (Exception e) {
-			throw new UnauthorizedException(userNoPassowrd);
+			throw new UnauthorizedException(e.getMessage());
 		}
 		
 		return response.signInResp(jwt, user);
@@ -200,7 +203,7 @@ public class AuthServiceImpl implements IAuthService, UserDetailsService {
 			.orElseThrow(() -> new BadRequestException(userNoExist)
 		);
 
-		String password = Text.uniqueString();
+		String password = text.uniqueString();
 
 		mail.send(
 			mailSubject,

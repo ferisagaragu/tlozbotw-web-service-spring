@@ -31,7 +31,7 @@ public class AuthResp {
 			"firstSession"
 		);
 
-		out.put("roles", buildRoles(user.getRoles()));
+		out.put("roles", user.getFormatRoles());
 
 		return response.created(message,out);
 	}
@@ -45,7 +45,7 @@ public class AuthResp {
 			"delete"
 		);
 
-		out.put("roles", buildRoles(user.getRoles()));
+		out.put("roles", user.getFormatRoles());
 		out.put("type", "Bearer");
 		out.put("token", token);
 
@@ -58,15 +58,6 @@ public class AuthResp {
 
 	public ResponseEntity<Object> changePassword(String message) {
 		return response.ok(message);
-	}
-
-
-	private List<String> buildRoles(List<Role> roles) {
-		List<String> rolesOut = new ArrayList<>();
-		roles.forEach((Role role) -> {
-			rolesOut.add(role.getName());
-		});
-		return rolesOut;
 	}
 
 }

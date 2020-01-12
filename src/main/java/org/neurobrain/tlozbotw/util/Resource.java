@@ -26,9 +26,15 @@ public class Resource {
 		}
 		return "";
 	}
-	
-	
-	public String passwordTemplate(String user, String firstPart, String secondPart, String password, String createdBy, String description) {
+
+	public String passwordTemplate(
+		String user,
+		String firstPart,
+		String secondPart,
+		String password,
+		String createdBy,
+		String description
+	) {
 		try {
 			ClassPathResource resource = new ClassPathResource("password-template.html");
 			InputStream inputStream = resource.getInputStream();
@@ -49,4 +55,5 @@ public class Resource {
 		
 		return "";
 	}
+
 }

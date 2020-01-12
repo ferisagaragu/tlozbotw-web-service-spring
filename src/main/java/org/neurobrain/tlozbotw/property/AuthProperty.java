@@ -27,7 +27,7 @@ public class AuthProperty {
 	private String userCreated;
 	private String userActivated;
 	private String userUpdate;
-	private String userBlocked;
+	private String userLocked;
 	private String userUnlocked;
 	private String userDeleted;
 	private String userRecoverPassword;
@@ -171,12 +171,12 @@ public class AuthProperty {
 		this.userUpdate = userUpdate;
 	}
 
-	public String getUserBlocked() {
-		return userBlocked;
+	public String getUserLocked() {
+		return userLocked;
 	}
 
-	public void setUserBlocked(String userBlocked) {
-		this.userBlocked = userBlocked;
+	public void setUserLocked(String userLocked) {
+		this.userLocked = userLocked;
 	}
 
 	public String getUserUnlocked() {

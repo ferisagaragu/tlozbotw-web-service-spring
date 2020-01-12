@@ -11,6 +11,7 @@ public class Request {
 
 	private String badMessage;
 
+
 	public Request() {
 		this.badMessage = " field not found";
 	}
@@ -24,8 +25,7 @@ public class Request {
 
 		throw new BadRequestException(key + badMessage);
 	}
-	
-	
+
 	public String getString(Object req, String key) {
 		Object reqOut = ((Map<?, ?>) req).get(key);
 		
@@ -35,8 +35,7 @@ public class Request {
 
 		throw new BadRequestException(key + badMessage);
 	}
-	
-	
+
 	public boolean getBoolean(Object req, String key) {
 		Object reqOut = ((Map<?, ?>) req).get(key);
 		
@@ -46,8 +45,7 @@ public class Request {
 
 		throw new BadRequestException(key + badMessage);
 	}
-	
-	
+
 	public List<Object> getList(Object req, String key) {
 		Object reqOut = ((Map<?, ?>) req).get(key);
 		

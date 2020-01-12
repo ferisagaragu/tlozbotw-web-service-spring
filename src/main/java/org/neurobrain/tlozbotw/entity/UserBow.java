@@ -7,7 +7,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-import org.neurobrain.tlozbotw.util.Text;
 import java.io.Serializable;
 
 
@@ -51,11 +50,6 @@ public class UserBow implements Serializable {
 
 	public void setSee(Boolean see) {
 		this.see = see;
-	}
-
-	@Override
-	public String toString() {
-		return Text.toJSONString(this);
 	}
 
 }

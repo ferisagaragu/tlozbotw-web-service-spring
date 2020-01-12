@@ -22,7 +22,8 @@ public class Mail {
 	
 	@Value("${app.auth.mail-password}")
 	private String password;
-	
+
+
 	public boolean send(String subject, String content, String... emails) {
 		boolean out = true;
 	
@@ -32,7 +33,8 @@ public class Mail {
 		
 		return out;
 	}
-	
+
+
 	private boolean sendIndividual(String email, String subject, String content) {
 		try {
 			Properties props = new Properties();

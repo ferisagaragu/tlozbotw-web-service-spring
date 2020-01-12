@@ -29,7 +29,7 @@ public class UserPrinciple implements UserDetails {
 
 	public UserPrinciple(
 		Long id, String name, 
-		String username, String email, String password, 
+		String username, String email, String password,
 		Collection<? extends GrantedAuthority> authorities
 	) {
 		this.id = id;
@@ -102,11 +102,6 @@ public class UserPrinciple implements UserDetails {
 	@Override
 	public boolean isEnabled() {
 		return true;
-	}
-
-	@Override
-	public String toString() {
-		return Text.toJSONString(this);
 	}
 	
 }

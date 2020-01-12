@@ -28,7 +28,11 @@ public class AuthControllerTest {
 
 	@Autowired
   private MockMvc mockMvc;
-	private String mockStg = Text.uniqueString();
+
+  @Autowired
+  private Text text;
+
+	private String mockStg = text.uniqueString();
 	private Gson gson = new Gson();
 
 	@Test

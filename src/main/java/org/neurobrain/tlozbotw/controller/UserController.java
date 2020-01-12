@@ -33,7 +33,7 @@ public class UserController {
 	 	@apiGroup User
 		@apiVersion 0.0.1
 		@apiDescription Servicio para iniciar sesión por primera vez
-		@api {post} user/firstSignin/:id firstSignin
+		@api {post} user/firstSignIn/:id firstSignIn
 		@apiPermission {user} {admin}
 
 		@apiParam {number} Id Identificador único
@@ -74,14 +74,14 @@ public class UserController {
 				"message": "your error message"
 			}
 	*/
-	@PostMapping("/firstSignin/{id}")
+	@PostMapping("/firstSignIn/{id}")
 	@PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
-	public ResponseEntity<Object> firstSignin(
+	public ResponseEntity<Object> firstSignIn(
 		@PathVariable("id") Long id,
 		@RequestBody Map<String, Object> req
 	) {
 		try {
-			return userService.firstSignin(id, req);
+			return userService.firstSignIn(id, req);
 		} catch (ResponseStatusException e) {
 			return httpExceptionResponse.error(e);
 		}
@@ -91,7 +91,7 @@ public class UserController {
 		@apiGroup User
 		@apiVersion 0.0.1
 		@apiDescription Servicio para actualizar un usuario
-		@api {put} user/update/:id update
+		@api {put} user/:id update
 		@apiPermission {user} {admin}
 
 		@apiParam {number} Id Identificador único
@@ -148,8 +148,8 @@ public class UserController {
 				"message": "your error message"
 			}
 	*/
-	@PutMapping("/update/{id}")
-	@PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+	@PutMapping("/{id}")
+	@PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
 	public ResponseEntity<Object> update(
 		@PathVariable("id") Long id,
 		@RequestBody Map<String, Object> req
@@ -165,7 +165,7 @@ public class UserController {
 		@apiGroup User
 		@apiVersion 0.0.1
 		@apiDescription Servicio para bloquear y desbloquear un usuario
-		@api {put} user/blocked/:id blocked
+		@api {put} user/lock/:id lock
 		@apiPermission {admin}
 
 		@apiParam {number} Id Identificador único
@@ -208,14 +208,14 @@ public class UserController {
 				"message": "your error message"
 			}
 	*/
-	@PutMapping("/blocked/{id}")
+	@PutMapping("/lock/{id}")
 	@PreAuthorize("hasRole('ADMIN')")
-	public ResponseEntity<Object> blocked(
+	public ResponseEntity<Object> lock(
 		@PathVariable("id") Long id,
 		@RequestBody Map<String, Object> req
 	) {
 		try {
-			return userService.blocked(id, req);
+			return userService.lock(id, req);
 		} catch (ResponseStatusException e) {
 			return httpExceptionResponse.error(e);
 		}
@@ -225,7 +225,7 @@ public class UserController {
 		@apiGroup User
 		@apiVersion 0.0.1
 		@apiDescription Servicio para eliminar un usuario (eliminación lógica)
-		@api {delete} user/delete/:id delete
+		@api {delete} user/:id delete
 		@apiPermission {admin}
 
 		@apiParam {number} Id Identificador único
@@ -262,7 +262,7 @@ public class UserController {
 				"message": "your error message"
 			}
 	*/
-	@DeleteMapping("/delete/{id}")
+	@DeleteMapping("/{id}")
 	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<Object> delete(
 		@PathVariable("id") Long id

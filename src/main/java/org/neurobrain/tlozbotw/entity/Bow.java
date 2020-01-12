@@ -14,7 +14,6 @@ import javax.persistence.Table;
 
 import java.io.Serializable;
 import java.util.List;
-import org.neurobrain.tlozbotw.util.Text;
 
 
 @Entity
@@ -103,11 +102,6 @@ public class Bow implements Serializable {
 
 	public void setUserBows(List<UserBow> userBows) {
 		this.userBows = userBows;
-	}
-
-	@Override
-	public String toString() {
-		return Text.toJSONString(this);
 	}
 
 }

@@ -2,7 +2,6 @@ package org.neurobrain.tlozbotw.entity;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-import org.neurobrain.tlozbotw.util.Text;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -53,11 +52,6 @@ public class Role implements Serializable {
 
 	public void setName(String name) {
 		this.name = name;
-	}
-
-	@Override
-	public String toString() {
-		return Text.toJSONString(this);
 	}
 
 }
