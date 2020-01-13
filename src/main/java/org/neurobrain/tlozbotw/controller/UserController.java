@@ -37,7 +37,61 @@ public class UserController {
 		this.httpExceptionResponse = httpExceptionResponse;
 	}
 
+	
+	/**
+	 	@apiGroup User
+		@apiVersion 0.0.1
+		@apiDescription Servicio para obtener un usuario por su id
+		@api {get} user/:id getUser
+		@apiPermission {admin}
 
+		@apiParam {number} Id Identificador único
+
+		@apiSuccessExample {json} HTTP/1.1 200 OK
+			{
+				"timestamp": "2020-01-13T21:39:25.437+0000",
+				"status": 200,
+				"data": {
+					"id": 1,
+					"name": "Fernando",
+					"lastName": "Aguirre",
+					"phoneNumber": "+(52) 33-23-81-47-52",
+					"imageUrl": "no linked",
+					"userName": "fernnypay95",
+					"email": "ferisagaragu@gmail.com",
+					"locked": false,
+					"enabled": true,
+					"roles": [
+						"ROLE_USER",
+						"ROLE_ADMIN"
+					]
+				}
+			}
+
+		@apiErrorExample {json} HTTP/1.1 400 Bad Request
+			{
+				"timestamp": "2020-01-13T17:54:01.902+0000",
+				"status": 400,
+				"error": "BAD_REQUEST",
+				"message": "your problem message"
+			}
+
+		@apiErrorExample {json} HTTP/1.1 401 Unauthorized
+			{
+				"timestamp": "2020-01-03T04:17:06.006+0000",
+				"status": 401,
+				"error": "Unauthorized",
+				"message": "Full authentication is required to access this resource"
+			}
+
+		@apiErrorExample {json} HTTP/1.1 500 Internal Server Error
+			{
+				"timestamp": "2020-01-03T17:37:02.348+0000",
+				"status": 500,
+				"error": "Internal Server Error",
+				"message": "your error message"
+			}
+	*/
 	@GetMapping("/{id}")
 	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<Object> getUser(@PathVariable Long id) {
@@ -48,6 +102,59 @@ public class UserController {
 		}
 	}
 
+	/**
+	 	@apiGroup User
+		@apiVersion 0.0.1
+		@apiDescription Servicio para obtener todos los usuarios
+		@api {get} user getAllUsers
+		@apiPermission {admin}
+
+		@apiSuccessExample {json} HTTP/1.1 200 OK
+			{
+				"timestamp": "2020-01-13T21:25:34.352+0000",
+				"status": 200,
+				"data": [
+					{
+						"id": user id,
+						"name": "user name",
+						"lastName": "user lastName",
+						"phoneNumber": "user phoneNumber",
+						"imageUrl": "user image",
+						"userName": "user name",
+						"email": "user email",
+						"locked": true | false,
+						"enabled": true | false,
+						"roles": [
+							"your roles"
+						]
+					}, ...
+				]
+			}
+
+		@apiErrorExample {json} HTTP/1.1 400 Bad Request
+			{
+				"timestamp": "2020-01-13T17:54:01.902+0000",
+				"status": 400,
+				"error": "BAD_REQUEST",
+				"message": "your problem message"
+			}
+
+		@apiErrorExample {json} HTTP/1.1 401 Unauthorized
+			{
+				"timestamp": "2020-01-03T04:17:06.006+0000",
+				"status": 401,
+				"error": "Unauthorized",
+				"message": "Full authentication is required to access this resource"
+			}
+
+		@apiErrorExample {json} HTTP/1.1 500 Internal Server Error
+			{
+				"timestamp": "2020-01-03T17:37:02.348+0000",
+				"status": 500,
+				"error": "Internal Server Error",
+				"message": "your error message"
+			}
+	*/
 	@GetMapping
 	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<Object> getAllUsers() {

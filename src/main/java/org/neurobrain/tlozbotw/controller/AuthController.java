@@ -123,7 +123,7 @@ public class AuthController {
 					"locked": true | false,
 					"enabled": true | false,
 					"roles": [
-            "ROLE_USER"
+						"ROLE_USER"
 					],
 					"type": "Bearer",
 					"token": "token auth"
