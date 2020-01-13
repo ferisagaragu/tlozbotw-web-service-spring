@@ -237,10 +237,6 @@ public class AuthServiceImpl implements IAuthService, UserDetailsService {
 			.orElseThrow(() -> new BadRequestException(userNoExist)
 		);
 
-		if (!userChange.getEnabled()) {
-			throw new BadRequestException("La cuenta seleccionada a sido eliminada");
-		}
-
 		userChange.setPassword(
 			encoder.encode(
 				request.getString(req, "password")
