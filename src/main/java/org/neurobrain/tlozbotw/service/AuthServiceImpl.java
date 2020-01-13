@@ -178,7 +178,7 @@ public class AuthServiceImpl implements IAuthService, UserDetailsService {
 		String userName = request.getString(req, this.userNameRef);
 		User user = searchUserName(userName);
 		String jwt;
-		
+
 		try {
 			Authentication authentication = authenticationManager.authenticate(
 				new UsernamePasswordAuthenticationToken(
@@ -204,6 +204,10 @@ public class AuthServiceImpl implements IAuthService, UserDetailsService {
 		User userEmail = userDao.findByEmail(request.getString(req, "email"))
 			.orElseThrow(() -> new BadRequestException(userNoExist)
 		);
+
+		if (!userEmail.getEnabled()) {
+			throw new BadRequestException("La cuenta seleccionada a sido eliminada");
+		}
 
 		String password = text.uniqueString();
 
@@ -232,6 +236,10 @@ public class AuthServiceImpl implements IAuthService, UserDetailsService {
 		User userChange = userDao.findByRecoverCode(request.getString(req, "code"))
 			.orElseThrow(() -> new BadRequestException(userNoExist)
 		);
+
+		if (!userChange.getEnabled()) {
+			throw new BadRequestException("La cuenta seleccionada a sido eliminada");
+		}
 
 		userChange.setPassword(
 			encoder.encode(

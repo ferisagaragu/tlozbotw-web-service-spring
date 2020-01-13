@@ -141,7 +141,6 @@ public class UserServiceImp implements IUserService {
 	@Override
 	@Transactional
 	public ResponseEntity<Object> lock(Long id, Map<String, Object> req) {
-
 		boolean locked = request.getBoolean(req, "locked");
 		User userLocked = userDao.findById(request.getLong(req, "userId"))
 			.orElseThrow(() -> new BadRequestException(userNoExist));
@@ -170,7 +169,7 @@ public class UserServiceImp implements IUserService {
 				saveUserLocked(userLocked, 3L, true);
 				sendMailLocked(userLocked, req);
 			} else {
-				System.out.println("Este chico no aprende");
+				delete(request.getLong(req, "userId"));
 			}
 
 			return response.lock(userLockedM);
@@ -189,6 +188,21 @@ public class UserServiceImp implements IUserService {
 		userDelete.setEnabled(false);
 		userDelete.getRoles().clear();
 		userDao.saveAndFlush(userDelete);
+
+		mail.send(
+			"No Reply",
+			resource.mailTemplate(
+				userDelete.getName(),
+				"Lo sentimos",
+				"Lamentamos informarte que tu cuenta a " +
+					"sido eliminada.",
+				"",
+				"TLOZ BOTW",
+				"Zelda Guide",
+				IconMail.BAD
+			),
+			userDelete.getEmail()
+		);
 
 		return response.delete(userDeleted);
 	}
