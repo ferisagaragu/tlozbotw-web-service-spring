@@ -31,7 +31,7 @@ public class TestController {
 	public ResponseEntity<Object> dao() {
 		User user = userDAO.findById(1L).orElse(null);
 		System.out.println(user);
-		return response.ok(response.toMap(user, "password", "id", "recoverCode", "firstSession"));
+		return response.ok(/*response.toMap(*/user/*, "password", "id", "recoverCode", "firstSession")*/);
 	}
 
 }

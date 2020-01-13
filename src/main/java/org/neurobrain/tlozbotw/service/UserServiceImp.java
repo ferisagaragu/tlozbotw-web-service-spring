@@ -1,17 +1,23 @@
 package org.neurobrain.tlozbotw.service;
 
 import java.util.ArrayList;
+import java.util.GregorianCalendar;
+import java.util.List;
 import java.util.Map;
 
 import org.neurobrain.tlozbotw.dao.IRoleDAO;
 import org.neurobrain.tlozbotw.dao.IUserDAO;
+import org.neurobrain.tlozbotw.entity.LockReason;
 import org.neurobrain.tlozbotw.entity.Role;
 import org.neurobrain.tlozbotw.entity.User;
+import org.neurobrain.tlozbotw.enums.IconMail;
 import org.neurobrain.tlozbotw.exception.BadRequestException;
 import org.neurobrain.tlozbotw.response.UserResp;
 import org.neurobrain.tlozbotw.service.interfaces.IUserService;
+import org.neurobrain.tlozbotw.util.Mail;
 import org.neurobrain.tlozbotw.util.Request;
 
+import org.neurobrain.tlozbotw.util.Resource;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -27,6 +33,8 @@ public class UserServiceImp implements IUserService {
 	private final PasswordEncoder encoder;
 	private final IUserDAO userDao;
 	private final IRoleDAO roleDao;
+	private final Mail mail;
+	private final Resource resource;
 	
 	@Value("${app.auth.user-no-exist}")
 	private String userNoExist;
@@ -61,13 +69,17 @@ public class UserServiceImp implements IUserService {
 		UserResp response,
 		PasswordEncoder encoder,
 		IUserDAO userDao,
-		IRoleDAO roleDao
+		IRoleDAO roleDao,
+		Mail mail,
+		Resource resource
 	) {
 		this.request = request;
 		this.response = response;
 		this.encoder = encoder;
 		this.userDao = userDao;
 		this.roleDao = roleDao;
+		this.mail = mail;
+		this.resource = resource;
 	}
 
 
@@ -85,6 +97,22 @@ public class UserServiceImp implements IUserService {
 					request.getString(req, "password")
 				)
 			);
+
+			mail.send(
+			"No Reply",
+				resource.mailTemplate(
+					user.getName(),
+					"Bienvenid@ a Tlozbotw Guide",
+					"Tu cuenta a sido verificada y activada " +
+						"satisfactoriamente con el nombre de usuario:",
+					user.getUserName(),
+					"TLOZ BOTW",
+					"Zelda Guide",
+					IconMail.SUCCESS
+				),
+				user.getEmail()
+			);
+
 		} else {
 			throw new BadRequestException(userWasSignin);
 		}
@@ -117,17 +145,41 @@ public class UserServiceImp implements IUserService {
 	public ResponseEntity<Object> lock(Long id, Map<String, Object> req) {
 
 		boolean locked = request.getBoolean(req, "locked");
-		User userBlocked = userDao.findById(id).orElseThrow(() ->
-			new BadRequestException(userNoExist)
-		);
-		userBlocked.setLocked(locked);
-		userDao.saveAndFlush(userBlocked);
+		User userLocked = userDao.findById(request.getLong(req, "userId"))
+			.orElseThrow(() -> new BadRequestException(userNoExist));
 
-		if (locked) {
-			return response.lock(userLockedM);
+		if (userLocked.containsRole("ADMIN")) {
+			throw new BadRequestException(
+				"El usuario seleccionado es administrador y no puede ser bloqueado"
+			);
 		}
 
-		return response.lock(userUnlocked);
+		if (locked) {
+			if (userLocked.getLockReasons().size() < 3) {
+				User lockerUser = userDao.findById(id).orElseThrow(() ->
+					new BadRequestException(userNoExist)
+				);
+
+				LockReason lockReason = new LockReason(
+					request.getString(req, "reasons"),
+					lockerUser.getEmail(),
+					1L,
+					new GregorianCalendar(),
+					userLocked
+				);
+				userLocked.getLockReasons().add(lockReason);
+
+				saveUserLocked(userLocked, 3L, true);
+				sendMailLocked(userLocked, req);
+			} else {
+				System.out.println("Este chico no aprende");
+			}
+
+			return response.lock(userLockedM);
+		} else {
+			saveUserLocked(userLocked, 1L, false);
+			return response.lock(userUnlocked);
+		}
 	}
 
 	@Override
@@ -166,6 +218,40 @@ public class UserServiceImp implements IUserService {
 		}
 
 		return !id.equals(user.getId());
+	}
+
+	private void saveUserLocked(User userLocked, Long roleId, boolean status) {
+		userLocked.setLocked(status);
+		userLocked.getRoles().clear();
+
+		Role role = roleDao.findById(roleId).orElseThrow(() ->
+			new BadRequestException("Rol no encontrado")
+		);
+
+		userLocked.getRoles().add(role);
+		userDao.saveAndFlush(userLocked);
+	}
+
+	private void sendMailLocked(User userLocked, Map<String, Object> req) {
+		mail.send(
+			"No Reply",
+			resource.mailTemplate(
+				userLocked.getName(),
+				"Has sido bloquead@",
+				"Desafortunadamente te informamos que " +
+				"tu cuenta a sido bloqueada por los administradores " +
+				"debido a las siguientes razon(es):",
+				request.getString(req, "reasons") +
+				"<br><br> <span style=\"font-size: 14px;\">Has sido bloqueado: "
+				+ userLocked.getLockReasons().size() + " vese(s)" +
+				"<br>Te recordamos que al ser bloqueada mas de 3 veces tu cuenta" +
+				 " sera definitivamente dada de baja.</span>",
+				"TLOZ BOTW",
+				"Zelda Guide",
+				IconMail.SUCCESS
+			),
+			userLocked.getEmail()
+		);
 	}
 
 }

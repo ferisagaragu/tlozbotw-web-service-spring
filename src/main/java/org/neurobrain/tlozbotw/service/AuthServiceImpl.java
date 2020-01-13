@@ -8,6 +8,7 @@ import org.neurobrain.tlozbotw.dao.IRoleDAO;
 import org.neurobrain.tlozbotw.dao.IUserDAO;
 import org.neurobrain.tlozbotw.entity.Role;
 import org.neurobrain.tlozbotw.entity.User;
+import org.neurobrain.tlozbotw.enums.IconMail;
 import org.neurobrain.tlozbotw.exception.BadRequestException;
 import org.neurobrain.tlozbotw.exception.UnauthorizedException;
 import org.neurobrain.tlozbotw.response.AuthResp;
@@ -156,13 +157,14 @@ public class AuthServiceImpl implements IAuthService, UserDetailsService {
 		
 		mail.send(
 			mailSubject,
-			resource.passwordTemplate(
+			resource.mailTemplate(
 				userOut.getName(),
 				mailMessage,
 				mailSubMessage,
 				password,
 				mailAppName,
-				mailAppDescription
+				mailAppDescription,
+				IconMail.PASSWORD
 			),
 			userOut.getEmail()
 		);
@@ -207,13 +209,14 @@ public class AuthServiceImpl implements IAuthService, UserDetailsService {
 
 		mail.send(
 			mailSubject,
-			resource.passwordTemplate(
+			resource.mailTemplate(
 				userEmail.getName(),
 				mailRecoverMessage,
 				mailRecoverSubMessage,
 				password,
 				mailAppName,
-				mailAppDescription
+				mailAppDescription,
+				IconMail.PASSWORD
 			),
 			userEmail.getEmail()
 		);

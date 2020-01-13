@@ -179,7 +179,7 @@ public class User implements Serializable {
 	}
 
 	public List<LockReason> getLockReasons() {
-		return lockReasons;
+		return lockReasons != null ? lockReasons : new ArrayList<>();
 	}
 
 	public void setLockReasons(List<LockReason> lockReasons) {

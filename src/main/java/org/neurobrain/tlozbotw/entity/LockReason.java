@@ -28,7 +28,7 @@ public class LockReason implements Serializable {
 
 	private String reason;
 	private String lockerMail;
-	private Long timeslocked;
+	private Long timesLocked;
 
 	@Temporal(TemporalType.DATE)
 	private Calendar lockDate;
@@ -36,6 +36,23 @@ public class LockReason implements Serializable {
 	@ManyToOne
 	@JoinColumn(name = "user_id")
 	private User user;
+
+
+	public LockReason() { }
+
+	public LockReason(
+		String reason,
+		String lockerMail,
+		Long timesLocked,
+		Calendar lockDate,
+		User user
+	) {
+		this.reason = reason;
+		this.lockerMail = lockerMail;
+		this.timesLocked = timesLocked;
+		this.lockDate = lockDate;
+		this.user = user;
+	}
 
 
 	public Long getId() {
@@ -70,12 +87,12 @@ public class LockReason implements Serializable {
 		this.lockerMail = lockerMail;
 	}
 
-	public Long getTimeslocked() {
-		return timeslocked;
+	public Long getTimesLocked() {
+		return timesLocked;
 	}
 
-	public void setTimeslocked(Long timeslocked) {
-		this.timeslocked = timeslocked;
+	public void setTimesLocked(Long timesLocked) {
+		this.timesLocked = timesLocked;
 	}
 
 	public Calendar getLockDate() {
