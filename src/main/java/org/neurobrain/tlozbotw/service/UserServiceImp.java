@@ -1,6 +1,7 @@
 package org.neurobrain.tlozbotw.service;
 
 import java.util.GregorianCalendar;
+import java.util.List;
 import java.util.Map;
 
 import org.neurobrain.tlozbotw.dao.IRoleDAO;
@@ -16,7 +17,6 @@ import org.neurobrain.tlozbotw.util.Mail;
 import org.neurobrain.tlozbotw.util.Request;
 
 import org.neurobrain.tlozbotw.util.Resource;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -53,6 +53,21 @@ public class UserServiceImp implements IUserService {
 		this.resource = resource;
 	}
 
+	@Override
+	@Transactional(readOnly = true)
+	public ResponseEntity<Object> getUser(Long id) {
+		User searchUser = userDao.findById(id).orElseThrow(() ->
+			new BadRequestException("Upps usuario no encontrado")
+		);
+		return response.getUserResp(searchUser);
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public ResponseEntity<Object> getAllUsers() {
+		List<User> users = userDao.findAll();
+		return response.getAllUsersResp(users);
+	}
 
 	@Override
 	@Transactional
@@ -76,7 +91,7 @@ public class UserServiceImp implements IUserService {
 		}
 
 		userDao.saveAndFlush(user);
-		return response.firstSignIn("Usuario activado exitosamente");
+		return response.firstSignInResp("Usuario activado exitosamente");
 	}
 
 	@Override
@@ -135,10 +150,10 @@ public class UserServiceImp implements IUserService {
 				delete(request.getLong(req, "userId"));
 			}
 
-			return response.lock("Usuario bloqueado exitosamente");
+			return response.lockResp("Usuario bloqueado exitosamente");
 		} else {
 			saveUserLocked(userLocked, 1L, false);
-			return response.lock("Usuario desbloqueado exitosamente");
+			return response.lockResp("Usuario desbloqueado exitosamente");
 		}
 	}
 
@@ -154,7 +169,7 @@ public class UserServiceImp implements IUserService {
 		userDao.saveAndFlush(userDelete);
 		sendMailDelete(userDelete);
 
-		return response.delete("Usuario eliminado con exitosamente");
+		return response.deleteResp("Usuario eliminado con exitosamente");
 	}
 
 

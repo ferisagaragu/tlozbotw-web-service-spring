@@ -1,5 +1,6 @@
 package org.neurobrain.tlozbotw.response;
 
+import java.util.List;
 import java.util.Map;
 
 import org.neurobrain.tlozbotw.entity.User;
@@ -19,30 +20,50 @@ public class UserResp {
 	}
 
 
-	public ResponseEntity<Object> firstSignIn(String message) {
+	public ResponseEntity<Object> getUserResp(User user) {
+		Map resp = response.toMap(
+			user,
+			new String[]{"getFormatRoles as roles"},
+			"password",
+			"recoverCode",
+			"firstSession"
+		);
+		return response.ok(resp);
+	}
+
+	public ResponseEntity<Object> getAllUsersResp(List<User> users) {
+		List resp = response.toListMap(
+			users,
+			new String[]{"getFormatRoles as roles"},
+			"password",
+			"recoverCode",
+			"firstSession"
+		);
+		return response.ok(resp);
+	}
+
+	public ResponseEntity<Object> firstSignInResp(String message) {
 		return response.ok(message);
 	}
 
 	public ResponseEntity<Object> updateUserResp(String message, User user) {
 		Map resp = response.toMap(
 			user,
+			new String[]{"getFormatRoles as roles"},
 			"password",
 			"recoverCode",
 			"blocked",
 			"delete",
 			"firstSession"
 		);
-
-		resp.put("roles", user.getFormatRoles());
-		
 		return response.ok(message, resp);
 	}
 
-	public ResponseEntity<Object> lock(String message) {
+	public ResponseEntity<Object> lockResp(String message) {
 		return response.ok(message);
 	}
 
-	public ResponseEntity<Object> delete(String message) {
+	public ResponseEntity<Object> deleteResp(String message) {
 		return response.ok(message);
 	}
 

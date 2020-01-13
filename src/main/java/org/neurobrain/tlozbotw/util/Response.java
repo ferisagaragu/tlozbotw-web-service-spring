@@ -92,6 +92,30 @@ public class Response {
 		return null;
 	}
 
+	public Map toMap(Object obj, String[] callMethods, String... excludes) {
+		Map<String, Object> out = new LinkedHashMap<>();
+
+		try {
+			Field[] fields = obj.getClass().getDeclaredFields();
+			for (Field field : fields) {
+				field.setAccessible(true);
+				if (isValidType(field) && isNotExclude(field.getName(), excludes)) {
+					out.put(field.getName(), field.get(obj));
+				}
+			}
+
+			for (String call:callMethods) {
+				out.put(asCall(call, 1), obj.getClass().getMethod(asCall(call, 0)).invoke(obj));
+			}
+
+			return out;
+		} catch (Exception e) {
+			response(e.getMessage(), null, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+
+		return null;
+	}
+
 	public List toListMap(List list) {
 		List out = new ArrayList();
 		for (Object object : list) {
@@ -104,6 +128,14 @@ public class Response {
 		List out = new ArrayList();
 		for (Object object : list) {
 			out.add(toMap(object, excludes));
+		}
+		return out;
+	}
+
+	public List toListMap(List list, String[] callMethods, String... excludes) {
+		List out = new ArrayList();
+		for (Object object : list) {
+			out.add(toMap(object, callMethods, excludes));
 		}
 		return out;
 	}
@@ -198,6 +230,18 @@ public class Response {
 			}
 		}
 		return true;
+	}
+
+	private String asCall(String call, int part) {
+		String[] callParts = call.split(" as ");
+		if (callParts.length == 2) {
+			if (part == 0) {
+				return callParts[0];
+			} else {
+				return callParts[1];
+			}
+		}
+		return callParts[0];
 	}
 
 }
