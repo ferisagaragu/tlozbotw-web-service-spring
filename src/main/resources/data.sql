@@ -2,6 +2,7 @@
 /*Roles*/
 INSERT INTO role(name) VALUES('ROLE_USER');
 INSERT INTO role(name) VALUES('ROLE_ADMIN');
+INSERT INTO role(name) VALUES('ROLE_LOCK');
 
 /*Row*/
 INSERT INTO bow (id, number_arrows, name, damage, description, img, available) VALUES (1, 1, 'Arco ancestral', 44, 'Arco elaborado con tecnología sheikah gracias a la investigación de Rotver. Dispara flechas que describen una trayectoria recta.', 'https://vignette.wikia.nocookie.net/zelda/images/a/a6/Ancient-bow.png/revision/latest/scale-to-width-down/65?cb=20180705172306&path-prefix=es', true);

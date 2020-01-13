@@ -52,10 +52,10 @@ public class UserController {
 
 		@apiErrorExample {json} HTTP/1.1 400 Bad Request
 			{
-				"timestamp": "2020-01-04T21:55:33.365+0000",
+				"timestamp": "2020-01-13T17:54:01.902+0000",
 				"status": 400,
 				"error": "BAD_REQUEST",
-				"message": "User already had his first login"
+				"message": "your problem message"
 			}
 
 		@apiErrorExample {json} HTTP/1.1 401 Unauthorized
@@ -172,7 +172,9 @@ public class UserController {
 
 		@apiParamExample {json} Request-Body:
 			{
-				"blocked": true | false
+				"locked": true | false,
+				"reasons": "your reasons",
+				"userId": user id
 			}
 
 		@apiSuccessExample {json} HTTP/1.1 200 OK

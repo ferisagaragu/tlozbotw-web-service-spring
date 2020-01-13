@@ -47,52 +47,6 @@ public class AuthServiceImpl implements IAuthService, UserDetailsService {
 	private final IUserDAO userDao;
 	private final IRoleDAO roleDao;
 	private final Text text;
- 
-	@Value("${app.auth.user-no-exist}")
-	private String userNoExist;
-	
-	@Value("${app.auth.user-no-password}")
-	private String userNoPassowrd;
-	
-	@Value("${app.auth.user-exist}")
-	private String userExist;
-	
-	@Value("${app.auth.user-created}")
-	private String userCreated;
-
-	@Value("${app.auth.user-change-password}")
-	private String userChangePassword;
-
-	@Value("${app.auth.user-recover-password}")
-	private String userRecoverPassword;
-
-	@Value("${app.auth.mail-exist}")
-	private String mailExist;
-	
-	@Value("${app.auth.phone-number-exist}")
-	private String phoneNumberExist;
-	
-	@Value("${app.auth.mail-subject}")
-	private String mailSubject;
-	
-	@Value("${app.auth.mail-message}")
-	private String mailMessage;
-	
-	@Value("${app.auth.mail-sub-message}")
-	private String mailSubMessage;
-	
-	@Value("${app.auth.mail-app-name}")
-	private String mailAppName;
-			
-	@Value("${app.auth.mail-app-description}")
-	private String mailAppDescription;
-
-	@Value("${app.auth.mail-recover-message}")
-	private String mailRecoverMessage;
-
-	@Value("${app.auth.mail-recover-sub-message}")
-	private String mailRecoverSubMessage;
-
 	private String userNameRef;
 	private String emailRef;
 
@@ -128,9 +82,8 @@ public class AuthServiceImpl implements IAuthService, UserDetailsService {
 	@Transactional(readOnly = true)
 	public UserDetails loadUserByUsername(String userName) {
 		User user = userDao.findByUserName(userName).orElseThrow(() ->
-			new UsernameNotFoundException(userNoExist)
+			new UsernameNotFoundException("Upps el usuario no existe")
 		);
-			
 		return UserPrinciple.build(user);
 	}
 
@@ -149,27 +102,16 @@ public class AuthServiceImpl implements IAuthService, UserDetailsService {
 		user.setEmail(request.getString(req, this.emailRef));
 		user.setPassword(encoder.encode(password));
 		user.setFirstSession(true);
+		user.setEnabled(true);
+		user.setLocked(false);
 
 		List<Role> roles = new ArrayList<>();
 		roles.add(roleDao.findById(1l).orElse(null));
 		user.setRoles(roles);
 		User userOut = userDao.saveAndFlush(user);
+		sendSignUpMail(userOut, password);
 		
-		mail.send(
-			mailSubject,
-			resource.mailTemplate(
-				userOut.getName(),
-				mailMessage,
-				mailSubMessage,
-				password,
-				mailAppName,
-				mailAppDescription,
-				IconMail.PASSWORD
-			),
-			userOut.getEmail()
-		);
-		
-		return response.signUpResp(userOut, userCreated);
+		return response.signUpResp(userOut, "Usuario creado con éxito");
 	}
 
 	@Override
@@ -192,7 +134,7 @@ public class AuthServiceImpl implements IAuthService, UserDetailsService {
 			user.setRecoverCode("");
 			userDao.saveAndFlush(user);
 		} catch (Exception e) {
-			throw new UnauthorizedException(e.getMessage());
+			throw new UnauthorizedException("Upps contraseña incorrecta");
 		}
 		
 		return response.signInResp(jwt, user);
@@ -202,7 +144,7 @@ public class AuthServiceImpl implements IAuthService, UserDetailsService {
 	@Transactional
 	public ResponseEntity<Object> recoverPassword(Map<String, Object> req) {
 		User userEmail = userDao.findByEmail(request.getString(req, "email"))
-			.orElseThrow(() -> new BadRequestException(userNoExist)
+			.orElseThrow(() -> new BadRequestException("Upps el usuario no existe")
 		);
 
 		if (!userEmail.getEnabled()) {
@@ -210,31 +152,22 @@ public class AuthServiceImpl implements IAuthService, UserDetailsService {
 		}
 
 		String password = text.uniqueString();
-
-		mail.send(
-			mailSubject,
-			resource.mailTemplate(
-				userEmail.getName(),
-				mailRecoverMessage,
-				mailRecoverSubMessage,
-				password,
-				mailAppName,
-				mailAppDescription,
-				IconMail.PASSWORD
-			),
-			userEmail.getEmail()
-		);
-
+		sendRecoverPasswordMail(userEmail, password);
 		userEmail.setRecoverCode(password);
 		userDao.saveAndFlush(userEmail);
-		return response.recoverPassword(userRecoverPassword);
+
+		return response.recoverPassword(
+			"Por favor revisa tu correo electrónico " +
+			"para corroborar tu código de cambio de " +
+			"contraseña"
+		);
 	}
 
 	@Override
 	@Transactional
 	public ResponseEntity<Object> changePassword(Map<String, Object> req) {
 		User userChange = userDao.findByRecoverCode(request.getString(req, "code"))
-			.orElseThrow(() -> new BadRequestException(userNoExist)
+			.orElseThrow(() -> new BadRequestException("Upps el usuario no existe")
 		);
 
 		userChange.setPassword(
@@ -245,7 +178,7 @@ public class AuthServiceImpl implements IAuthService, UserDetailsService {
 
 		userChange.setRecoverCode("");
 		userDao.saveAndFlush(userChange);
-		return response.changePassword(userChangePassword);
+		return response.changePassword("Tu contraseña se actualizo correctamente");
 	}
 
 
@@ -254,21 +187,27 @@ public class AuthServiceImpl implements IAuthService, UserDetailsService {
 			request.getString(req, this.userNameRef)
 		).orElse(null);
 		if (userName != null) {
-			throw new BadRequestException(userExist);
+			throw new BadRequestException(
+				"Upps el usuario a registrar ya existe"
+			);
 		}
 		
 		User userEmail = userDao.findByEmail(
 			request.getString(req, this.emailRef)
 		).orElse(null);
 		if (userEmail != null) {
-			throw new BadRequestException(mailExist);
+			throw new BadRequestException(
+				"Upps el usuario seleccionado ya existe"
+			);
 		}
 		
 		User userPhone = userDao.findByPhoneNumber(
 			request.getString(req, "phoneNumber")
 		).orElse(null);
 		if (userPhone != null) {
-			throw new BadRequestException(phoneNumberExist);
+			throw new BadRequestException(
+				"Upps el número telefónico seleccionado ya existe"
+			);
 		}
 	}
 
@@ -279,12 +218,48 @@ public class AuthServiceImpl implements IAuthService, UserDetailsService {
 			user = userDao.findByEmail(userName).orElse(null);
 			if (user == null) {
 				user = userDao.findByPhoneNumber(userName).orElseThrow(() ->
-					new UnauthorizedException(userNoExist)
+					new UnauthorizedException("Upps el usuario no existe")
 				);
 			}
 		}
 		
 		return user;
+	}
+
+	private void sendRecoverPasswordMail(User userEmail, String password) {
+		mail.send(
+			"No Reply",
+			resource.mailTemplate(
+				userEmail.getName(),
+				"Sabemos que has perdido tu contraseña, " +
+				"te mostramos el código de recuperación para " +
+				"que sigas los pasos y accedas a tu cuenta de nuevamente.",
+				"Tu contraseña es:",
+				password,
+				"TLOZ BOTW",
+				"Zelda Guide",
+				IconMail.PASSWORD
+			),
+			userEmail.getEmail()
+		);
+	}
+
+	private void sendSignUpMail(User userOut, String password) {
+		mail.send(
+			"No Reply",
+			resource.mailTemplate(
+				userOut.getName(),
+				"Gracias por registrarse en 'TLOZBOTW Guide' " +
+				"a continuación, te presentamos la contraseña para tu " +
+				"primer inicio de sesión.",
+				"Tu contraseña es:",
+				password,
+				"TLOZ BOTW",
+				"Zelda Guide",
+				IconMail.PASSWORD
+			),
+			userOut.getEmail()
+		);
 	}
 
 }

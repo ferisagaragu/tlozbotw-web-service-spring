@@ -42,19 +42,33 @@ public class AuthController {
 				"email": "your email"
 			}
 
-		@apiSuccessExample {json} HTTP/1.1 200 OK
+		@apiSuccessExample {json} HTTP/1.1 201 Created
 			{
-				"timestamp": "2020-01-03T04:05:37.126+0000",
-				"status": 200,
-				"message": "your success message"
+				"timestamp": "2020-01-13T16:58:42.255+0000",
+				"status": 201,
+				"message": "Usuario creado con éxito",
+				"data": {
+					"id": your id,
+					"name": "your name",
+					"lastName": "your lastName",
+					"phoneNumber": "your phoneNumber",
+					"imageUrl": "your imageUrl",
+					"userName": "your userName",
+					"email": "your email",
+					"locked": true | false,
+					"enabled": true | false,
+					"roles": [
+						"ROLE_USER"
+					]
+				}
 			}
 
 		@apiErrorExample {json} HTTP/1.1 400 Bad Request
 			{
-				"timestamp": "2020-01-03T16:42:13.727+0000",
+				"timestamp": "2020-01-13T17:07:06.179+0000",
 				"status": 400,
 				"error": "BAD_REQUEST",
-				"message": "your problem message"
+				"message": "Upps el usuario a registrar ya existe"
 			}
 
 		@apiErrorExample {json} HTTP/1.1 500 Internal Server Error
@@ -66,7 +80,7 @@ public class AuthController {
 			}
 	*/
 	@PostMapping("/signUp")
-	public ResponseEntity<Object> signup(
+	public ResponseEntity<Object> signUp(
 		@RequestBody Map<String, Object> req
 	) {
 		try {
@@ -91,22 +105,24 @@ public class AuthController {
 
 		@apiSuccessExample {json} HTTP/1.1 200 OK
 			{
-				"timestamp": "2020-01-03T20:21:07.712+0000",
+				"timestamp": "2020-01-13T17:25:00.963+0000",
 				"status": 200,
 				"data": {
-					"id": identify id,
-					"type": "Bearer",
-					"token": "your token",
+					"id": your id,
 					"name": "your name",
-					"lastName": "your last name",
-					"phoneNumber": "your phone number",
-					"imageUrl": "your account photo",
-					"userName": "your user name",
+					"lastName": "your lastName",
+					"phoneNumber": "your phoneNumber",
+					"imageUrl": "your imageUrl",
+					"userName": "your userName",
 					"email": "your email",
 					"firstSession": true | false,
+					"locked": true | false,
+					"enabled": true | false,
 					"roles": [
-						"your roles"
-					]
+            "ROLE_USER"
+					],
+					"type": "Bearer",
+					"token": "token auth"
 				}
 			}
 

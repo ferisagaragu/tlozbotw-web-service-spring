@@ -197,9 +197,9 @@ public class User implements Serializable {
 
 	public List<String> getFormatRoles() {
 		List<String> rolesOut = new ArrayList<>();
-		roles.forEach((Role role) -> {
-			rolesOut.add(role.getName());
-		});
+		roles.forEach((Role role) ->
+			rolesOut.add(role.getName())
+		);
 		return rolesOut;
 	}
 

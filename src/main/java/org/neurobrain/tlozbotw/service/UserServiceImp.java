@@ -33,33 +33,6 @@ public class UserServiceImp implements IUserService {
 	private final IRoleDAO roleDao;
 	private final Mail mail;
 	private final Resource resource;
-	
-	@Value("${app.auth.user-no-exist}")
-	private String userNoExist;
-	
-	@Value("${app.auth.user-activated}")
-	private String userActivated;
-	
-	@Value("${app.auth.user-update}")
-	private String userUpdated;
-	
-	@Value("${app.auth.user-exist}")
-	private String userExist;
-	
-	@Value("${app.auth.phone-number-exist}")
-	private String phoneNumberExist;
-
-	@Value("${app.auth.user-locked}")
-	private String userLockedM;
-
-	@Value("${app.auth.user-unlocked}")
-	private String userUnlocked;
-
-	@Value("${app.auth.user-deleted}")
-	private String userDeleted;
-
-	@Value("${app.auth.user-was-signin}")
-	private String userWasSignin;
 
 
 	public UserServiceImp(
@@ -85,7 +58,7 @@ public class UserServiceImp implements IUserService {
 	@Transactional
 	public ResponseEntity<Object> firstSignIn(Long id, Map<String, Object> req) {
 		User user = userDao.findById(id).orElseThrow(() ->
-			new BadRequestException(userNoExist)
+			new BadRequestException("Upps usuario no encontrado")
 		);
 
 		if (user.getFirstSession()) {
@@ -95,35 +68,22 @@ public class UserServiceImp implements IUserService {
 					request.getString(req, "password")
 				)
 			);
-
-			mail.send(
-			"No Reply",
-				resource.mailTemplate(
-					user.getName(),
-					"Bienvenid@ a Tlozbotw Guide",
-					"Tu cuenta a sido verificada y activada " +
-						"satisfactoriamente con el nombre de usuario:",
-					user.getUserName(),
-					"TLOZ BOTW",
-					"Zelda Guide",
-					IconMail.SUCCESS
-				),
-				user.getEmail()
-			);
-
+			sendMailFirstSignIn(user);
 		} else {
-			throw new BadRequestException(userWasSignin);
+			throw new BadRequestException(
+				"Upps ya has tenido tu primer sesión con anterioridad"
+			);
 		}
 
 		userDao.saveAndFlush(user);
-		return response.firstSignIn(userActivated);
+		return response.firstSignIn("Usuario activado exitosamente");
 	}
 
 	@Override
 	@Transactional
 	public ResponseEntity<Object> update(Long id, Map<String, Object> req) {
 		User userUpdate = userDao.findById(id).orElseThrow(() -> 
-			new BadRequestException(userNoExist)
+			new BadRequestException("Upps usuario no encontrado")
 		); 
 		
 		userOrPhoneNumberExist(id, req);
@@ -135,7 +95,10 @@ public class UserServiceImp implements IUserService {
 		userUpdate.setName(request.getString(req, "name"));
 		userDao.saveAndFlush(userUpdate);
 		
-		return response.updateUserResp(userUpdated, userUpdate);
+		return response.updateUserResp(
+			"Usuario actualizado satisfactoriamente",
+			userUpdate
+		);
 	}
 
 	@Override
@@ -143,7 +106,7 @@ public class UserServiceImp implements IUserService {
 	public ResponseEntity<Object> lock(Long id, Map<String, Object> req) {
 		boolean locked = request.getBoolean(req, "locked");
 		User userLocked = userDao.findById(request.getLong(req, "userId"))
-			.orElseThrow(() -> new BadRequestException(userNoExist));
+			.orElseThrow(() -> new BadRequestException("Upps usuario no encontrado"));
 
 		if (userLocked.containsRole("ADMIN")) {
 			throw new BadRequestException(
@@ -154,7 +117,7 @@ public class UserServiceImp implements IUserService {
 		if (locked) {
 			if (userLocked.getLockReasons().size() < 3) {
 				User lockerUser = userDao.findById(id).orElseThrow(() ->
-					new BadRequestException(userNoExist)
+					new BadRequestException("Upps usuario no encontrado")
 				);
 
 				LockReason lockReason = new LockReason(
@@ -172,10 +135,10 @@ public class UserServiceImp implements IUserService {
 				delete(request.getLong(req, "userId"));
 			}
 
-			return response.lock(userLockedM);
+			return response.lock("Usuario bloqueado exitosamente");
 		} else {
 			saveUserLocked(userLocked, 1L, false);
-			return response.lock(userUnlocked);
+			return response.lock("Usuario desbloqueado exitosamente");
 		}
 	}
 
@@ -183,28 +146,15 @@ public class UserServiceImp implements IUserService {
 	@Transactional
 	public ResponseEntity<Object> delete(Long id) {
 		User userDelete = userDao.findById(id).orElseThrow(() ->
-			new BadRequestException(userNoExist)
+			new BadRequestException("Upps usuario no encontrado")
 		);
+
 		userDelete.setEnabled(false);
 		userDelete.getRoles().clear();
 		userDao.saveAndFlush(userDelete);
+		sendMailDelete(userDelete);
 
-		mail.send(
-			"No Reply",
-			resource.mailTemplate(
-				userDelete.getName(),
-				"Lo sentimos",
-				"Lamentamos informarte que tu cuenta a " +
-					"sido eliminada.",
-				"",
-				"TLOZ BOTW",
-				"Zelda Guide",
-				IconMail.BAD
-			),
-			userDelete.getEmail()
-		);
-
-		return response.delete(userDeleted);
+		return response.delete("Usuario eliminado con exitosamente");
 	}
 
 
@@ -213,14 +163,16 @@ public class UserServiceImp implements IUserService {
 			request.getString(req, "userName")
 		).orElse(null);
 		if (notExistUser(id, user)) {
-			throw new BadRequestException(userExist);
+			throw new BadRequestException("Upps el usuario seleccionado ya existe");
 		}
 		
 		User userPhoneNumber = userDao.findByPhoneNumber(
 			request.getString(req, "phoneNumber")
 		).orElse(null);
 		if (notExistUser(id, userPhoneNumber)) {
-			throw new BadRequestException(phoneNumberExist);
+			throw new BadRequestException(
+				"Upps el número telefónico seleccionado ya existe"
+			);
 		}
 	}
 
@@ -263,6 +215,40 @@ public class UserServiceImp implements IUserService {
 				IconMail.SUCCESS
 			),
 			userLocked.getEmail()
+		);
+	}
+
+	private void sendMailDelete(User userDelete) {
+		mail.send(
+			"No Reply",
+			resource.mailTemplate(
+				userDelete.getName(),
+				"Lo sentimos",
+				"Lamentamos informarte que tu cuenta a " +
+					"sido eliminada.",
+				"",
+				"TLOZ BOTW",
+				"Zelda Guide",
+				IconMail.BAD
+			),
+			userDelete.getEmail()
+		);
+	}
+
+	private void sendMailFirstSignIn(User user) {
+		mail.send(
+			"No Reply",
+			resource.mailTemplate(
+				user.getName(),
+				"Bienvenid@ a Tlozbotw Guide",
+				"Tu cuenta a sido verificada y activada " +
+					"satisfactoriamente con el nombre de usuario:",
+				user.getUserName(),
+				"TLOZ BOTW",
+				"Zelda Guide",
+				IconMail.SUCCESS
+			),
+			user.getEmail()
 		);
 	}
 
