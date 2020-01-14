@@ -104,7 +104,7 @@ public class Response {
 				}
 			}
 
-			for (String call:callMethods) {
+			for (String call : callMethods) {
 				out.put(asCall(call, 1), obj.getClass().getMethod(asCall(call, 0)).invoke(obj));
 			}
 

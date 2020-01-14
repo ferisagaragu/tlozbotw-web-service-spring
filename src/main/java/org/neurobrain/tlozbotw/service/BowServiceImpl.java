@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Map;
 
+
 @Service
 public class BowServiceImpl implements IBowService {
 
@@ -23,6 +24,7 @@ public class BowServiceImpl implements IBowService {
 	private final IBowDAO bowDAO;
 	private final BowResp bowResp;
 	private final Request request;
+
 
 	public BowServiceImpl(
 		IUserDAO userDAO,
@@ -36,6 +38,7 @@ public class BowServiceImpl implements IBowService {
 		this.request = request;
 	}
 
+
 	@Override
 	@Transactional(readOnly = true)
 	public ResponseEntity<Object> getAllBow(Long id) {
@@ -44,12 +47,10 @@ public class BowServiceImpl implements IBowService {
 		);
 
 		if (user.containsRole("ADMIN")) {
-			System.out.println("Es administrador");
 			return bowResp.getAllBowRespAdmin(
 				bowDAO.findAll()
 			);
 		} else if (user.containsRole("USER")) {
-			System.out.println("Es usuario");
 			List<Bow> bows = bowDAO.findAllNotIn(id);
 			return bowResp.getAllBowResp(user, bows);
 		}
@@ -66,7 +67,42 @@ public class BowServiceImpl implements IBowService {
 		bow.setNumberArrows(request.getLong(req, "numberArrows"));
 		bow.setDescription(request.getString(req, "description"));
 		bow.setImg(request.getString(req, "img"));
+		bow.setAvailable(true);
 		return bowResp.createBowResp(
+			"El arco '" + bow.getName() + "' a sido creado",
+			bowDAO.saveAndFlush(bow)
+		);
+	}
+
+	@Override
+	@Transactional
+	public ResponseEntity<Object> updateBow(Long id, Map<String, Object> req) {
+		Bow bow = bowDAO.findById(id).orElseThrow(() ->
+			new BadRequestException("Upps el usuario no existe")
+		);
+
+		bow.setName(request.getString(req, "name"));
+		bow.setDamage(request.getLong(req, "damage"));
+		bow.setDescription(request.getString(req, "description"));
+		bow.setImg(request.getString(req, "img"));
+		bow.setNumberArrows(request.getLong(req, "numberArrows"));
+
+		return bowResp.updateBowResp(
+			"Arco actualizado exitosamente",
+			bowDAO.saveAndFlush(bow)
+		);
+	}
+
+	@Override
+	@Transactional
+	public ResponseEntity<Object> deleteBow(Long id) {
+		Bow bow = bowDAO.findById(id).orElseThrow(() ->
+			new BadRequestException("Upps el usuario no existe")
+		);
+		bow.setAvailable(false);
+
+		return bowResp.deleteBowResp(
+			"El arco '" + bow.getName() + "' fue eliminado exitosamente",
 			bowDAO.saveAndFlush(bow)
 		);
 	}

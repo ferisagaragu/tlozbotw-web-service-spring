@@ -49,4 +49,30 @@ public class BowController {
 		}
 	}
 
+	@PutMapping("/{id}")
+	@PreAuthorize("hasRole('ADMIN')")
+	public ResponseEntity<Object> updateBow(
+		@PathVariable Long id,
+		@RequestBody Map<String, Object> req
+	) {
+		try {
+			return bowService.updateBow(id, req);
+		} catch (ResponseStatusException e) {
+			return httpExceptionResponse.error(e);
+		}
+	}
+
+	@DeleteMapping("/{id}")
+	@PreAuthorize("hasRole('ADMIN')")
+	public ResponseEntity<Object> deleteBow(
+		@PathVariable Long id
+	) {
+		try {
+			return bowService.deleteBow(id);
+		} catch (ResponseStatusException e) {
+			return httpExceptionResponse.error(e);
+		}
+	}
+
+
 }

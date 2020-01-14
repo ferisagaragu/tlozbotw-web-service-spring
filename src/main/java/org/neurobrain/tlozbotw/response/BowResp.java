@@ -9,7 +9,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -24,69 +23,55 @@ public class BowResp {
 	}
 
 	public ResponseEntity<Object> getAllBowRespAdmin(List<Bow> bows) {
-		Map<String, Object> resp = new LinkedHashMap<>();
-		List<Object> bowsOut = new ArrayList<>();
-
-		bows.forEach((Bow bow) ->
-			bowsOut.add(
-				createBow(
-					bow,
-					null,
-					true
-				)
-			)
-		);
-
-		resp.put("bows", bowsOut);
-		return response.ok(resp);
+		return response.ok(response.toListMap(bows));
 	}
 
 	public ResponseEntity<Object> getAllBowResp(User user, List<Bow> bows) {
-		Map<String, Object> resp = new LinkedHashMap<>();
 		List<Object> bowsOut = new ArrayList<>();
 
-			for (UserBow userBow : user.getUserBows()) {
-				if (userBow.getBow().getAvailable()) {
-					bowsOut.add(
-						createBow(
-							userBow.getBow(),
-							userBow,
-							false
-						)
-					);
-				}
+		for (UserBow userBow : user.getUserBows()) {
+			if (userBow.getBow().getAvailable()) {
+				bowsOut.add(
+					createBow(
+						userBow.getBow(),
+						userBow
+					)
+				);
 			}
+		}
 
-			for (Bow bow : bows) {
-				bowsOut.add(createBow(bow, null, false));
-			}
+		for (Bow bow : bows) {
+			bowsOut.add(createBow(bow, null));
+		}
 
-		resp.put("bows", bowsOut);
-		return response.ok(resp);
+		return response.ok(bowsOut);
 	}
 
-	public ResponseEntity<Object> createBowResp(Bow bow) {
+	public ResponseEntity<Object> createBowResp(String message, Bow bow) {
 		return response.created(
-			"El arco '" + bow.getName() + "' a sido creado",
-			createBow(bow, null, false)
+			message,
+			response.toMap(bow)
 		);
 	}
 
-	private Map<String, Object> createBow(Bow bow, UserBow userBow, boolean isAdmin) {
-		Map<String, Object> bowOut = new LinkedHashMap<>();
-		bowOut.put("id", bow.getId());
-		bowOut.put("name", bow.getName());
-		bowOut.put("damage", bow.getDamage());
-		bowOut.put("numberArrows", bow.getNumberArrows());
-		bowOut.put("description", bow.getDescription());
-		bowOut.put("img", bow.getImg());
+	public ResponseEntity<Object> updateBowResp(String message, Bow bow) {
+		return response.ok(
+			message,
+			response.toMap(bow, "available")
+		);
+	}
 
-		if (isAdmin) {
-			bowOut.put("available", bow.getAvailable());
-		} else {
-			bowOut.put("see", userBow != null ? userBow.getSee() : false);
-		}
+	public ResponseEntity<Object> deleteBowResp(String message, Bow bow) {
+		return response.ok(
+			message,
+			response.toMap(bow)
+		);
+	}
 
+
+	private Map<String, Object> createBow(Bow bow, UserBow userBow) {
+		Map bowOut = response.toMap(bow, "available");
+		bowOut.put("see", userBow != null ? userBow.getSee() : false);
 		return bowOut;
 	}
 }
