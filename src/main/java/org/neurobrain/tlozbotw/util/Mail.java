@@ -63,7 +63,6 @@ public class Mail {
 			
 			Transport.send(msg);
 		} catch (MessagingException e) {
-			e.printStackTrace();
 			return false;
 		}
 		
