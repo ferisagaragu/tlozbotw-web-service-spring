@@ -1,7 +1,5 @@
 package org.neurobrain.tlozbotw.controller;
 
-import java.util.Map;
-
 import org.neurobrain.tlozbotw.exception.HttpExceptionResponse;
 import org.neurobrain.tlozbotw.service.interfaces.IUserService;
 
@@ -43,7 +41,7 @@ public class UserController {
 	 	@apiGroup User
 		@apiVersion 0.0.1
 		@apiDescription Servicio para obtener un usuario por su id
-		@api {get} user/:id getUser
+		@api {get} user/:id get
 		@apiPermission {admin}
 
 		@apiParam {number} Id Identificador único
@@ -107,7 +105,7 @@ public class UserController {
 	 	@apiGroup User
 		@apiVersion 0.0.1
 		@apiDescription Servicio para obtener todos los usuarios
-		@api {get} user getAllUsers
+		@api {get} user get-all-users
 		@apiPermission {admin}
 
 		@apiSuccessExample {json} HTTP/1.1 200 OK
@@ -170,7 +168,7 @@ public class UserController {
 	 	@apiGroup User
 		@apiVersion 0.0.1
 		@apiDescription Servicio para iniciar sesión por primera vez
-		@api {post} user/firstSignIn/:id firstSignIn
+		@api {post} user/first-sign-in/:id first-sign-in
 		@apiPermission {user} {admin}
 
 		@apiParam {number} Id Identificador único
@@ -211,7 +209,7 @@ public class UserController {
 				"message": "your error message"
 			}
 	*/
-	@PostMapping("/firstSignIn/{id}")
+	@PostMapping("/first-sign-in/{id}")
 	@PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
 	public ResponseEntity<Object> firstSignIn(
 		@PathVariable("id") Long id,

@@ -6,6 +6,7 @@ target/
 
 ## DOC ##
 apidoc/
+style/
 
 ## SCANNER ##
 .scannerwork
