@@ -18,11 +18,11 @@ public class HttpExceptionResponse {
 
 
 	public ResponseEntity<Object> error(ResponseStatusException e) {
-		Map<String, Object> resp = new LinkedHashMap<>();
-		resp.put("timestamp", new Date());
-		resp.put("status", e.getStatus().value());
-		resp.put("error", e.getStatus());
-		resp.put("message", e.getReason());
+		Map<String, Object> response = new LinkedHashMap<>();
+		response.put("timestamp", new Date());
+		response.put("status", e.getStatus().value());
+		response.put("error", e.getStatus());
+		response.put("message", e.getReason());
 
 		try {
 			Object developMessage = e.getClass().getMethod(
@@ -30,7 +30,7 @@ public class HttpExceptionResponse {
 			).invoke(e);
 
 			if (developMessage != null) {
-				resp.put("developMessage", developMessage);
+				response.put("developMessage", developMessage);
 			}
 		} catch (Exception ex) {
 			logger.info("No develop message send");
@@ -38,7 +38,7 @@ public class HttpExceptionResponse {
 
 		logger.error(e.getMessage());
 		return new ResponseEntity<>(
-			resp,
+			response,
 			e.getStatus()
 		);
 	}

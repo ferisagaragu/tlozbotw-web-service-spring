@@ -1,10 +1,9 @@
 package org.neurobrain.tlozbotw.controller;
 
-import java.util.Map;
-
 import org.neurobrain.tlozbotw.exception.HttpExceptionResponse;
 import org.neurobrain.tlozbotw.service.interfaces.IAuthService;
 
+import org.neurobrain.tlozbotw.util.Request;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,7 +23,10 @@ public class AuthController {
 	private final HttpExceptionResponse httpExceptionResponse;
 
 
-	public AuthController(IAuthService authService, HttpExceptionResponse httpExceptionResponse) {
+	public AuthController(
+		IAuthService authService,
+		HttpExceptionResponse httpExceptionResponse
+	) {
 		this.authService = authService;
 		this.httpExceptionResponse = httpExceptionResponse;
 	}
@@ -34,7 +36,7 @@ public class AuthController {
 	 	@apiGroup Auth
 		@apiVersion 0.0.1
 		@apiDescription Servicio para registrar un nuevo usuario
-		@api {post} auth/signUp/ signUp
+		@api {post} auth/sign-up/ signUp
 		@apiPermission none
 
 		@apiParamExample {json} Request-Body:
@@ -84,12 +86,12 @@ public class AuthController {
 				"message": "your error message"
 			}
 	*/
-	@PostMapping("/signUp")
+	@PostMapping("/sign-up")
 	public ResponseEntity<Object> signUp(
-		@RequestBody Map<String, Object> req
+		@RequestBody Request<String, Object> request
 	) {
 		try {
-			return authService.signUp(req);
+			return authService.signUp(request);
 		} catch (ResponseStatusException e) {
 			return httpExceptionResponse.error(e);
 		}
@@ -99,7 +101,7 @@ public class AuthController {
 	 	@apiGroup Auth
 		@apiVersion 0.0.1
 		@apiDescription Servicio para iniciar sesión
-		@api {post} auth/signIn signIn
+		@api {post} auth/sign-in sign-in
 		@apiPermission none
 
 		@apiParamExample {json} Request-Body:
@@ -147,12 +149,12 @@ public class AuthController {
 				"message": "your error message"
 			}
 	*/
-	@PostMapping("/signIn")
+	@PostMapping("/sign-in")
 	public ResponseEntity<Object> signIn(
-		@RequestBody Map<String, Object> req
+		@RequestBody Request<String, Object> request
 	) {
 		try {
-			return authService.signIn(req);
+			return authService.signIn(request);
 		} catch (ResponseStatusException e) {
 			return httpExceptionResponse.error(e);
 		}
@@ -162,7 +164,7 @@ public class AuthController {
 	 	@apiGroup Auth
 		@apiVersion 0.0.1
 		@apiDescription Servicio para recuperar contraseña del usuario
-		@api {post} auth/recoverPassword recoverPassword
+		@api {post} auth/recover-password recover-password
 		@apiPermission none
 
 		@apiParamExample {json} Request-Body:
@@ -193,12 +195,12 @@ public class AuthController {
 				"message": "your error message"
 			}
 	*/
-	@PostMapping("/recoverPassword")
+	@PostMapping("/recover-password")
 	public ResponseEntity<Object> recoverPassword(
-		@RequestBody Map<String, Object> req
+		@RequestBody Request<String, Object> request
 	) {
 		try {
-			return authService.recoverPassword(req);
+			return authService.recoverPassword(request);
 		} catch (ResponseStatusException e) {
 			return httpExceptionResponse.error(e);
 		}
@@ -208,7 +210,7 @@ public class AuthController {
 	 	@apiGroup Auth
 		@apiVersion 0.0.1
 		@apiDescription Servicio para cambiar la contraseña recuperada
-		@api {post} auth/changePassword changePassword
+		@api {post} auth/change-password change-password
 		@apiPermission none
 
 		@apiParamExample {json} Request-Body:
@@ -240,12 +242,12 @@ public class AuthController {
 				"message": "your error message"
 			}
 	*/
-	@PostMapping("/changePassword")
+	@PostMapping("/change-password")
 	public ResponseEntity<Object> changePassword(
-		@RequestBody Map<String, Object> req
+		@RequestBody Request<String, Object> request
 	)	{
 		try {
-			return authService.changePassword(req);
+			return authService.changePassword(request);
 		} catch (ResponseStatusException e) {
 			return httpExceptionResponse.error(e);
 		}

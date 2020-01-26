@@ -1,11 +1,11 @@
 package org.neurobrain.tlozbotw.service.interfaces;
 
-import java.util.Map;
+import org.neurobrain.tlozbotw.util.Request;
 import org.springframework.http.ResponseEntity;
 
 public interface IAuthService {
-	ResponseEntity<Object> signUp(Map<String, Object> req);
-	ResponseEntity<Object> signIn(Map<String, Object> req);
-	ResponseEntity<Object> recoverPassword(Map<String, Object> req);
-	ResponseEntity<Object> changePassword(Map<String, Object> req);
+	ResponseEntity<Object> signUp(Request<String, Object> request);
+	ResponseEntity<Object> signIn(Request<String, Object> request);
+	ResponseEntity<Object> recoverPassword(Request<String, Object> request);
+	ResponseEntity<Object> changePassword(Request<String, Object> request);
 }

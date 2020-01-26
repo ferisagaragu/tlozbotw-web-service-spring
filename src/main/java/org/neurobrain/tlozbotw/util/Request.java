@@ -1,13 +1,12 @@
 package org.neurobrain.tlozbotw.util;
 
-import java.util.List;
-import java.util.Map;
-
 import org.neurobrain.tlozbotw.exception.BadRequestException;
-import org.springframework.stereotype.Component;
 
-@Component
-public class Request {
+import java.util.LinkedHashMap;
+import java.util.List;
+
+
+public class Request<K, V> extends LinkedHashMap<String, Object> {
 
 	private String badMessage;
 
@@ -16,19 +15,20 @@ public class Request {
 		this.badMessage = " field not found";
 	}
 
-		public Long getLong(Object req, String key) {
-		Object reqOut = ((Map<?, ?>) req).get(key);
-		
+
+	public Long getLong(String key) {
+		Object reqOut = this.get(key);
+
 		if (reqOut != null) {
-			return Long.valueOf(reqOut.toString()); 
+			return Long.valueOf(reqOut.toString());
 		}
 
 		throw new BadRequestException(key + badMessage);
 	}
 
-	public String getString(Object req, String key) {
-		Object reqOut = ((Map<?, ?>) req).get(key);
-		
+	public String getString(String key) {
+		Object reqOut = this.get(key);
+
 		if (reqOut != null) {
 			return reqOut.toString();
 		}
@@ -36,9 +36,9 @@ public class Request {
 		throw new BadRequestException(key + badMessage);
 	}
 
-	public boolean getBoolean(Object req, String key) {
-		Object reqOut = ((Map<?, ?>) req).get(key);
-		
+	public boolean getBoolean(String key) {
+		Object reqOut = this.get(key);
+
 		if (reqOut != null) {
 				return reqOut.toString().equals("true");
 		}
@@ -46,14 +46,14 @@ public class Request {
 		throw new BadRequestException(key + badMessage);
 	}
 
-	public List<Object> getList(Object req, String key) {
-		Object reqOut = ((Map<?, ?>) req).get(key);
-		
+	public List<Object> getList(String key) {
+		Object reqOut = this.get(key);
+
 		if (reqOut != null) {
 			return (List<Object>) reqOut;
 		}
 
 		throw new BadRequestException(key  + badMessage);
 	}
-	
+
 }

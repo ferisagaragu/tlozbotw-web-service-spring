@@ -3,12 +3,11 @@ package org.neurobrain.tlozbotw.controller;
 import org.neurobrain.tlozbotw.exception.HttpExceptionResponse;
 import org.neurobrain.tlozbotw.service.interfaces.IBowService;
 
+import org.neurobrain.tlozbotw.util.Request;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
-
-import java.util.Map;
 
 
 @CrossOrigin(origins = "*")
@@ -41,9 +40,9 @@ public class BowController {
 
 	@PostMapping
 	@PreAuthorize("hasRole('ADMIN')")
-	public ResponseEntity<Object> createBow(@RequestBody Map<String, Object> req) {
+	public ResponseEntity<Object> createBow(@RequestBody Request<String, Object> request) {
 		try {
-			return bowService.createBow(req);
+			return bowService.createBow(request);
 		} catch (ResponseStatusException e) {
 			return httpExceptionResponse.error(e);
 		}
@@ -53,10 +52,10 @@ public class BowController {
 	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<Object> updateBow(
 		@PathVariable Long id,
-		@RequestBody Map<String, Object> req
+		@RequestBody Request<String, Object> request
 	) {
 		try {
-			return bowService.updateBow(id, req);
+			return bowService.updateBow(id, request);
 		} catch (ResponseStatusException e) {
 			return httpExceptionResponse.error(e);
 		}

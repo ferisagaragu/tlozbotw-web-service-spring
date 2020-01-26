@@ -28,21 +28,19 @@ public class AuthControllerTest {
 
 	@Autowired
   private MockMvc mockMvc;
-
-  @Autowired
-  private Text text;
-
-	private String mockStg = text.uniqueString();
+  private Text text = new Text();
 	private Gson gson = new Gson();
 
+	private String mockStg = text.uniqueString();
+
 	@Test
-	public void signin_ok() throws Exception {
+	public void sign_in_ok() throws Exception {
 		Map<String, Object> body = new LinkedHashMap<>();
 		body.put("userName", "ferisagaragu@gmail.com");
-		body.put("password", "fernny27");
+		body.put("password", "OTEyN2MyYzgtNjZk");
 
 		this.mockMvc.perform(
-			post("/auth/signin")
+			post("/auth/sign-in")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(gson.toJson(body))
 		).andDo(print())
@@ -51,13 +49,13 @@ public class AuthControllerTest {
 	}
 
 	@Test
-	public void signin_unauthorized() throws Exception {
+	public void sign_in_unauthorized() throws Exception {
 		Map<String, Object> body = new LinkedHashMap<>();
 		body.put("userName", "ferisagaragu@gmail.com");
 		body.put("password", "fernny");
 
 		this.mockMvc.perform(
-			post("/auth/signin")
+			post("/auth/sign-in")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(gson.toJson(body))
 		).andDo(print())
@@ -66,13 +64,13 @@ public class AuthControllerTest {
 	}
 
 	@Test
-	public void signin_bad_request() throws Exception{
+	public void sign_in_bad_request() throws Exception{
 		Map<String, Object> body = new LinkedHashMap<>();
 		body.put("userNam", "ferisagaragu@gmail.com");
 		body.put("password", "fernny");
 
 		this.mockMvc.perform(
-			post("/auth/signin")
+			post("/auth/sign-in")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(gson.toJson(body))
 		).andDo(print())
@@ -82,7 +80,7 @@ public class AuthControllerTest {
 
 
 	@Test
-	public void signup_ok() throws Exception {
+	public void sign_up_ok() throws Exception {
 		Map<String, Object> body = new LinkedHashMap<>();
 		body.put("name", mockStg);
 		body.put("lastName", mockStg);
@@ -92,7 +90,7 @@ public class AuthControllerTest {
 		body.put("email", mockStg + "@gmail.com");
 
 		this.mockMvc.perform(
-			post("/auth/signup")
+			post("/auth/sign-up")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(gson.toJson(body))
 		).andDo(print())
@@ -111,7 +109,7 @@ public class AuthControllerTest {
 		body.put("email", "ferisagaragu@gmail.com");
 
 		this.mockMvc.perform(
-			post("/auth/signup")
+			post("/auth/sign-up")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(gson.toJson(body))
 		).andDo(print())
@@ -130,7 +128,7 @@ public class AuthControllerTest {
 		body.put("email", "ferisagaragu@gmail.com");
 
 		this.mockMvc.perform(
-			post("/auth/signup")
+			post("/auth/sign-up")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(gson.toJson(body))
 		).andDo(print())
@@ -145,7 +143,7 @@ public class AuthControllerTest {
 		body.put("email", "ferisagaragu@gmail.com");
 
 		this.mockMvc.perform(
-			post("/auth/recoverPassword")
+			post("/auth/recover-password")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(gson.toJson(body))
 		).andDo(print())
@@ -159,7 +157,7 @@ public class AuthControllerTest {
 		body.put("email", "ferisagaragu@gmail.co");
 
 		this.mockMvc.perform(
-			post("/auth/recoverPassword")
+			post("/auth/recover-password")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(gson.toJson(body))
 		).andDo(print())
@@ -173,7 +171,7 @@ public class AuthControllerTest {
 		body.put("emai", "ferisagaragu@gmail.com");
 
 		this.mockMvc.perform(
-			post("/auth/recoverPassword")
+			post("/auth/recover-password")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(gson.toJson(body))
 		).andDo(print())
@@ -185,11 +183,11 @@ public class AuthControllerTest {
 	@Test
 	public void changePassword_ok() throws Exception {
 		Map<String, Object> body = new LinkedHashMap<>();
-		body.put("code", "ZTQxYjdjZjktYjA1");
+		body.put("code", "Y2E2NDU1ODAtOTEz");
 		body.put("password", "fernny27");
 
 		this.mockMvc.perform(
-			post("/auth/changePassword")
+			post("/auth/change-password")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(gson.toJson(body))
 		).andDo(print())
@@ -204,7 +202,7 @@ public class AuthControllerTest {
 		body.put("password", "fernny27");
 
 		this.mockMvc.perform(
-			post("/auth/changePassword")
+			post("/auth/change-password")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(gson.toJson(body))
 		).andDo(print())
@@ -219,7 +217,7 @@ public class AuthControllerTest {
 		body.put("passwor", "fernny27");
 
 		this.mockMvc.perform(
-			post("/auth/changePassword")
+			post("/auth/change-password")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(gson.toJson(body))
 		).andDo(print())

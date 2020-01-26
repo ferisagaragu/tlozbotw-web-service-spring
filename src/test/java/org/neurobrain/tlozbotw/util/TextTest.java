@@ -11,6 +11,7 @@ public class TextTest {
 	@Description("normal function test")
 	public void toJSONString() {
 		User user = new User();
+
 		/*String assertStg = Text.toJSONString(user);
 		assertEquals('{', assertStg.charAt(0));
 		assertEquals('}', assertStg.charAt(assertStg.length() - 1));*/

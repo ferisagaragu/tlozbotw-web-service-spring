@@ -23,11 +23,8 @@ import org.neurobrain.tlozbotw.service.AuthServiceImpl;
 )
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
-	@Autowired
-	public AuthServiceImpl userDetailsService;
-
-	@Autowired
-	private JwtAuthEntryPoint unauthorizedHandler;
+	@Autowired public AuthServiceImpl userDetailsService;
+	@Autowired private JwtAuthEntryPoint unauthorizedHandler;
 
 
 	@Bean

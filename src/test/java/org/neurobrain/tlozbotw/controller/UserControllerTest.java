@@ -26,7 +26,7 @@ public class UserControllerTest {
 
 	@Autowired
   private MockMvc mockMvc;
-	private String token = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJmZXJubnlwYXk5NSIsImlhdCI6MTU3ODMyOTk4NSwiZXhwIjoxNTc4MzQ3OTg1fQ.iDVA0H3tE3Iuchdbx47wt4_WRBZPxaEs89tJjsxsQSsgM-Q4nuL9O8MrABkMvYEb4eLzFlPe9ZZyO1P6s9aVpA";
+	private String token = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJmZXJubnlwYXk5NSIsImlhdCI6MTU3OTk5Nzk4NCwiZXhwIjoxNTgwMDE1OTg0fQ.QNGthM5gzVguysZ1DcTKQ7FXUvybrvJVJv2BSqH5Ni6QeCWTU0SdrDOsL-PYXvn_8PdF3qkvW2w1LWc5YfGeog";
 	private Gson gson = new Gson();
 
 	@Test
@@ -36,7 +36,7 @@ public class UserControllerTest {
 		body.put("password", "fernny27");
 
 		this.mockMvc.perform(
-			post("/user/firstSignin/1")
+			post("/user/firstSignIn/1")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(gson.toJson(body))
 				.header("Authorization", "Bearer " + token)

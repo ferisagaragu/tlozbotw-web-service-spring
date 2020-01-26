@@ -14,8 +14,8 @@ import org.neurobrain.tlozbotw.exception.BadRequestException;
 import org.neurobrain.tlozbotw.response.UserResp;
 import org.neurobrain.tlozbotw.service.interfaces.IUserService;
 import org.neurobrain.tlozbotw.util.Mail;
-import org.neurobrain.tlozbotw.util.Request;
 
+import org.neurobrain.tlozbotw.util.Request;
 import org.neurobrain.tlozbotw.util.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -26,7 +26,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class UserServiceImp implements IUserService {
 
-	private final Request request;
 	private final UserResp response;
 	private final PasswordEncoder encoder;
 	private final IUserDAO userDao;
@@ -36,7 +35,6 @@ public class UserServiceImp implements IUserService {
 
 
 	public UserServiceImp(
-		Request request,
 		UserResp response,
 		PasswordEncoder encoder,
 		IUserDAO userDao,
@@ -44,7 +42,6 @@ public class UserServiceImp implements IUserService {
 		Mail mail,
 		Resource resource
 	) {
-		this.request = request;
 		this.response = response;
 		this.encoder = encoder;
 		this.userDao = userDao;
@@ -71,7 +68,7 @@ public class UserServiceImp implements IUserService {
 
 	@Override
 	@Transactional
-	public ResponseEntity<Object> firstSignIn(Long id, Map<String, Object> req) {
+	public ResponseEntity<Object> firstSignIn(Long id, Request<String, Object> request) {
 		User user = userDao.findById(id).orElseThrow(() ->
 			new BadRequestException("Upps usuario no encontrado")
 		);
@@ -80,7 +77,7 @@ public class UserServiceImp implements IUserService {
 			user.setFirstSession(false);
 			user.setPassword(
 				encoder.encode(
-					request.getString(req, "password")
+					request.getString("password")
 				)
 			);
 			sendMailFirstSignIn(user);
@@ -96,18 +93,18 @@ public class UserServiceImp implements IUserService {
 
 	@Override
 	@Transactional
-	public ResponseEntity<Object> update(Long id, Map<String, Object> req) {
+	public ResponseEntity<Object> update(Long id, Request<String, Object> request) {
 		User userUpdate = userDao.findById(id).orElseThrow(() -> 
 			new BadRequestException("Upps usuario no encontrado")
 		); 
 		
-		userOrPhoneNumberExist(id, req);
+		userOrPhoneNumberExist(id, request);
 		
-		userUpdate.setUserName(request.getString(req, "userName"));
-		userUpdate.setPhoneNumber(request.getString(req, "phoneNumber"));
-		userUpdate.setLastName(request.getString(req, "lastName"));
-		userUpdate.setImageUrl(request.getString(req, "imageUrl"));
-		userUpdate.setName(request.getString(req, "name"));
+		userUpdate.setUserName(request.getString("userName"));
+		userUpdate.setPhoneNumber(request.getString("phoneNumber"));
+		userUpdate.setLastName(request.getString("lastName"));
+		userUpdate.setImageUrl(request.getString("imageUrl"));
+		userUpdate.setName(request.getString("name"));
 		userDao.saveAndFlush(userUpdate);
 		
 		return response.updateUserResp(
@@ -118,9 +115,9 @@ public class UserServiceImp implements IUserService {
 
 	@Override
 	@Transactional
-	public ResponseEntity<Object> lock(Long id, Map<String, Object> req) {
-		boolean locked = request.getBoolean(req, "locked");
-		User userLocked = userDao.findById(request.getLong(req, "userId"))
+	public ResponseEntity<Object> lock(Long id, Request<String, Object> request) {
+		boolean locked = request.getBoolean("locked");
+		User userLocked = userDao.findById(request.getLong("userId"))
 			.orElseThrow(() -> new BadRequestException("Upps usuario no encontrado"));
 
 		if (userLocked.containsRole("ADMIN")) {
@@ -136,7 +133,7 @@ public class UserServiceImp implements IUserService {
 				);
 
 				LockReason lockReason = new LockReason(
-					request.getString(req, "reasons"),
+					request.getString("reasons"),
 					lockerUser.getEmail(),
 					1L,
 					new GregorianCalendar(),
@@ -145,9 +142,9 @@ public class UserServiceImp implements IUserService {
 				userLocked.getLockReasons().add(lockReason);
 
 				saveUserLocked(userLocked, 3L, true);
-				sendMailLocked(userLocked, req);
+				sendMailLocked(userLocked, request);
 			} else {
-				delete(request.getLong(req, "userId"));
+				delete(request.getLong("userId"));
 			}
 
 			return response.lockResp("Usuario bloqueado exitosamente");
@@ -173,16 +170,16 @@ public class UserServiceImp implements IUserService {
 	}
 
 
-	private void userOrPhoneNumberExist(Long id, Map<String, Object> req) {
+	private void userOrPhoneNumberExist(Long id, Request<String, Object> request) {
 		User user = userDao.findByUserName(
-			request.getString(req, "userName")
+			request.getString("userName")
 		).orElse(null);
 		if (notExistUser(id, user)) {
 			throw new BadRequestException("Upps el usuario seleccionado ya existe");
 		}
 		
 		User userPhoneNumber = userDao.findByPhoneNumber(
-			request.getString(req, "phoneNumber")
+			request.getString("phoneNumber")
 		).orElse(null);
 		if (notExistUser(id, userPhoneNumber)) {
 			throw new BadRequestException(
@@ -211,7 +208,7 @@ public class UserServiceImp implements IUserService {
 		userDao.saveAndFlush(userLocked);
 	}
 
-	private void sendMailLocked(User userLocked, Map<String, Object> req) {
+	private void sendMailLocked(User userLocked, Request<String, Object> request) {
 		mail.send(
 			"No Reply",
 			resource.mailTemplate(
@@ -220,7 +217,7 @@ public class UserServiceImp implements IUserService {
 				"Desafortunadamente te informamos que " +
 				"tu cuenta a sido bloqueada por los administradores " +
 				"debido a las siguientes razon(es):",
-				request.getString(req, "reasons") +
+				request.getString("reasons") +
 				"<br><br> <span style=\"font-size: 14px;\">Has sido bloqueado: "
 				+ userLocked.getLockReasons().size() + " vese(s)" +
 				"<br>Te recordamos que al ser bloqueada mas de 3 veces tu cuenta" +

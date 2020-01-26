@@ -142,20 +142,20 @@ public class Response {
 
 
 	private ResponseEntity<Object> response(String message, Object data, HttpStatus status) {
-		Map<String, Object> resp = new LinkedHashMap<>();
-		resp.put("timestamp", new Date());
-		resp.put("status", status.value());
+		Map<String, Object> response = new LinkedHashMap<>();
+		response.put("timestamp", new Date());
+		response.put("status", status.value());
 
 		if (message != null) {
-			resp.put("message", message);
+			response.put("message", message);
 		}
 
 		if (data != null) {
-			resp.put("data", data);
+			response.put("data", data);
 		}
 
 		return new ResponseEntity<> (
-			resp,
+			response,
 			status
 		);
 	}

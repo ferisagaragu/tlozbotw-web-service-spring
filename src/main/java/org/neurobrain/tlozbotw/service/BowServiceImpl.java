@@ -23,19 +23,16 @@ public class BowServiceImpl implements IBowService {
 	private final IUserDAO userDAO;
 	private final IBowDAO bowDAO;
 	private final BowResp bowResp;
-	private final Request request;
 
 
 	public BowServiceImpl(
 		IUserDAO userDAO,
 		IBowDAO bowDAO,
-		BowResp bowResp,
-		Request request
+		BowResp bowResp
 	) {
 		this.userDAO = userDAO;
 		this.bowDAO = bowDAO;
 		this.bowResp = bowResp;
-		this.request = request;
 	}
 
 
@@ -60,13 +57,13 @@ public class BowServiceImpl implements IBowService {
 
 	@Override
 	@Transactional
-	public ResponseEntity<Object> createBow(Map<String, Object> req) {
+	public ResponseEntity<Object> createBow(Request<String, Object> request) {
 		Bow bow = new Bow();
-		bow.setName(request.getString(req, "name"));
-		bow.setDamage(request.getLong(req, "damage"));
-		bow.setNumberArrows(request.getLong(req, "numberArrows"));
-		bow.setDescription(request.getString(req, "description"));
-		bow.setImg(request.getString(req, "img"));
+		bow.setName(request.getString("name"));
+		bow.setDamage(request.getLong("damage"));
+		bow.setNumberArrows(request.getLong("numberArrows"));
+		bow.setDescription(request.getString("description"));
+		bow.setImg(request.getString("img"));
 		bow.setAvailable(true);
 		return bowResp.createBowResp(
 			"El arco '" + bow.getName() + "' a sido creado",
@@ -76,16 +73,16 @@ public class BowServiceImpl implements IBowService {
 
 	@Override
 	@Transactional
-	public ResponseEntity<Object> updateBow(Long id, Map<String, Object> req) {
+	public ResponseEntity<Object> updateBow(Long id, Request<String, Object> request) {
 		Bow bow = bowDAO.findById(id).orElseThrow(() ->
 			new BadRequestException("Upps el usuario no existe")
 		);
 
-		bow.setName(request.getString(req, "name"));
-		bow.setDamage(request.getLong(req, "damage"));
-		bow.setDescription(request.getString(req, "description"));
-		bow.setImg(request.getString(req, "img"));
-		bow.setNumberArrows(request.getLong(req, "numberArrows"));
+		bow.setName(request.getString("name"));
+		bow.setDamage(request.getLong("damage"));
+		bow.setDescription(request.getString("description"));
+		bow.setImg(request.getString("img"));
+		bow.setNumberArrows(request.getLong("numberArrows"));
 
 		return bowResp.updateBowResp(
 			"Arco actualizado exitosamente",

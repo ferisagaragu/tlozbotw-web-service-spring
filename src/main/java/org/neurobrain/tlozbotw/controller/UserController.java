@@ -5,6 +5,7 @@ import java.util.Map;
 import org.neurobrain.tlozbotw.exception.HttpExceptionResponse;
 import org.neurobrain.tlozbotw.service.interfaces.IUserService;
 
+import org.neurobrain.tlozbotw.util.Request;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 
@@ -214,10 +215,10 @@ public class UserController {
 	@PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
 	public ResponseEntity<Object> firstSignIn(
 		@PathVariable("id") Long id,
-		@RequestBody Map<String, Object> req
+		@RequestBody Request<String, Object> request
 	) {
 		try {
-			return userService.firstSignIn(id, req);
+			return userService.firstSignIn(id, request);
 		} catch (ResponseStatusException e) {
 			return httpExceptionResponse.error(e);
 		}
@@ -288,10 +289,10 @@ public class UserController {
 	@PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
 	public ResponseEntity<Object> update(
 		@PathVariable("id") Long id,
-		@RequestBody Map<String, Object> req
+		@RequestBody Request<String, Object> request
 	) {
 		try {
-			return userService.update(id, req);
+			return userService.update(id, request);
 		} catch (ResponseStatusException e) {
 			return httpExceptionResponse.error(e);
 		}
@@ -350,10 +351,10 @@ public class UserController {
 	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<Object> lock(
 		@PathVariable("id") Long id,
-		@RequestBody Map<String, Object> req
+		@RequestBody Request<String, Object> request
 	) {
 		try {
-			return userService.lock(id, req);
+			return userService.lock(id, request);
 		} catch (ResponseStatusException e) {
 			return httpExceptionResponse.error(e);
 		}

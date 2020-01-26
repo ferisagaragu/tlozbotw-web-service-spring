@@ -21,25 +21,25 @@ public class UserResp {
 
 
 	public ResponseEntity<Object> getUserResp(User user) {
-		Map resp = response.toMap(
+		Map response = this.response.toMap(
 			user,
 			new String[]{"getFormatRoles as roles"},
 			"password",
 			"recoverCode",
 			"firstSession"
 		);
-		return response.ok(resp);
+		return this.response.ok(response);
 	}
 
 	public ResponseEntity<Object> getAllUsersResp(List<User> users) {
-		List resp = response.toListMap(
+		List response = this.response.toListMap(
 			users,
 			new String[]{"getFormatRoles as roles"},
 			"password",
 			"recoverCode",
 			"firstSession"
 		);
-		return response.ok(resp);
+		return this.response.ok(response);
 	}
 
 	public ResponseEntity<Object> firstSignInResp(String message) {
@@ -47,7 +47,7 @@ public class UserResp {
 	}
 
 	public ResponseEntity<Object> updateUserResp(String message, User user) {
-		Map resp = response.toMap(
+		Map response = this.response.toMap(
 			user,
 			new String[]{"getFormatRoles as roles"},
 			"password",
@@ -56,7 +56,7 @@ public class UserResp {
 			"delete",
 			"firstSession"
 		);
-		return response.ok(message, resp);
+		return this.response.ok(message, response);
 	}
 
 	public ResponseEntity<Object> lockResp(String message) {

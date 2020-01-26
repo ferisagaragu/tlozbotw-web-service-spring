@@ -2,7 +2,6 @@ package org.neurobrain.tlozbotw.service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import org.neurobrain.tlozbotw.dao.IRoleDAO;
 import org.neurobrain.tlozbotw.dao.IUserDAO;
@@ -16,11 +15,11 @@ import org.neurobrain.tlozbotw.security.JwtProvider;
 import org.neurobrain.tlozbotw.security.UserPrinciple;
 import org.neurobrain.tlozbotw.service.interfaces.IAuthService;
 import org.neurobrain.tlozbotw.util.Mail;
-import org.neurobrain.tlozbotw.util.Request;
 import org.neurobrain.tlozbotw.util.Resource;
+import org.neurobrain.tlozbotw.util.Request;
 import org.neurobrain.tlozbotw.util.Text;
 
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -37,42 +36,20 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class AuthServiceImpl implements IAuthService, UserDetailsService {
 
-	private final AuthenticationManager authenticationManager;
-	private final JwtProvider jwtProvider;
-	private final PasswordEncoder encoder;
-	private final Mail mail;
-	private final Resource resource;
-	private final AuthResp response;
-	private final Request request;
-	private final IUserDAO userDao;
-	private final IRoleDAO roleDao;
-	private final Text text;
+	@Autowired private AuthenticationManager authenticationManager;
+	@Autowired private JwtProvider jwtProvider;
+	@Autowired private PasswordEncoder encoder;
+	@Autowired private Mail mail;
+	@Autowired private Resource resource;
+	@Autowired private AuthResp response;
+	@Autowired private IUserDAO userDao;
+	@Autowired private IRoleDAO roleDao;
+	@Autowired private Text text;
 	private String userNameRef;
 	private String emailRef;
 
 
-	public AuthServiceImpl(
-		AuthenticationManager authenticationManager,
-		JwtProvider jwtProvider,
-		PasswordEncoder encoder,
-		Mail mail,
-		Resource resource,
-		AuthResp response,
-		Request request,
-		IUserDAO userDao,
-		IRoleDAO roleDao,
-		Text text
-	) {
-		this.authenticationManager = authenticationManager;
-		this.jwtProvider = jwtProvider;
-		this.encoder = encoder;
-		this.mail = mail;
-		this.resource = resource;
-		this.response = response;
-		this.request = request;
-		this.userDao = userDao;
-		this.roleDao = roleDao;
-		this.text = text;
+	public AuthServiceImpl() {
 		this.userNameRef = "userName";
 		this.emailRef = "email";
 	}
@@ -89,17 +66,17 @@ public class AuthServiceImpl implements IAuthService, UserDetailsService {
 
 	@Override
 	@Transactional
-	public ResponseEntity<Object> signUp(Map<String, Object> req) {
-		existUser(req);
+	public ResponseEntity<Object> signUp(Request<String, Object> request) {
+		existUser(request);
 		
 		String password = text.uniqueString();
 		User user = new User();
-		user.setName(request.getString(req, "name"));
-		user.setLastName(request.getString(req, "lastName"));
-		user.setPhoneNumber(request.getString(req, "phoneNumber"));
-		user.setImageUrl(request.getString(req, "imageUrl"));
-		user.setUserName(request.getString(req, this.userNameRef));
-		user.setEmail(request.getString(req, this.emailRef));
+		user.setName(request.getString("name"));
+		user.setLastName(request.getString("lastName"));
+		user.setPhoneNumber(request.getString("phoneNumber"));
+		user.setImageUrl(request.getString("imageUrl"));
+		user.setUserName(request.getString(this.userNameRef));
+		user.setEmail(request.getString(this.emailRef));
 		user.setPassword(encoder.encode(password));
 		user.setFirstSession(true);
 		user.setEnabled(true);
@@ -116,8 +93,8 @@ public class AuthServiceImpl implements IAuthService, UserDetailsService {
 
 	@Override
 	@Transactional
-	public ResponseEntity<Object> signIn(Map<String, Object> req) {
-		String userName = request.getString(req, this.userNameRef);
+	public ResponseEntity<Object> signIn(Request<String, Object> request) {
+		String userName = request.getString(this.userNameRef);
 		User user = searchUserName(userName);
 		String jwt;
 
@@ -125,7 +102,7 @@ public class AuthServiceImpl implements IAuthService, UserDetailsService {
 			Authentication authentication = authenticationManager.authenticate(
 				new UsernamePasswordAuthenticationToken(
 					user.getUserName(),
-					request.getString(req, "password")
+					request.getString("password")
 				)
 			);
 	 
@@ -142,8 +119,8 @@ public class AuthServiceImpl implements IAuthService, UserDetailsService {
 
 	@Override
 	@Transactional
-	public ResponseEntity<Object> recoverPassword(Map<String, Object> req) {
-		User userEmail = userDao.findByEmail(request.getString(req, "email"))
+	public ResponseEntity<Object> recoverPassword(Request<String, Object> request) {
+		User userEmail = userDao.findByEmail(request.getString("email"))
 			.orElseThrow(() -> new BadRequestException("Upps el usuario no existe")
 		);
 
@@ -165,14 +142,14 @@ public class AuthServiceImpl implements IAuthService, UserDetailsService {
 
 	@Override
 	@Transactional
-	public ResponseEntity<Object> changePassword(Map<String, Object> req) {
-		User userChange = userDao.findByRecoverCode(request.getString(req, "code"))
+	public ResponseEntity<Object> changePassword(Request<String, Object> request) {
+		User userChange = userDao.findByRecoverCode(request.getString("code"))
 			.orElseThrow(() -> new BadRequestException("Upps el usuario no existe")
 		);
 
 		userChange.setPassword(
 			encoder.encode(
-				request.getString(req, "password")
+				request.getString("password")
 			)
 		);
 
@@ -182,9 +159,9 @@ public class AuthServiceImpl implements IAuthService, UserDetailsService {
 	}
 
 
-	private void existUser(Map<String, Object> req) {
+	private void existUser(Request<String, Object> request) {
 		User userName = userDao.findByUserName(
-			request.getString(req, this.userNameRef)
+			request.getString(this.userNameRef)
 		).orElse(null);
 		if (userName != null) {
 			throw new BadRequestException(
@@ -193,7 +170,7 @@ public class AuthServiceImpl implements IAuthService, UserDetailsService {
 		}
 		
 		User userEmail = userDao.findByEmail(
-			request.getString(req, this.emailRef)
+			request.getString(this.emailRef)
 		).orElse(null);
 		if (userEmail != null) {
 			throw new BadRequestException(
@@ -202,7 +179,7 @@ public class AuthServiceImpl implements IAuthService, UserDetailsService {
 		}
 		
 		User userPhone = userDao.findByPhoneNumber(
-			request.getString(req, "phoneNumber")
+			request.getString("phoneNumber")
 		).orElse(null);
 		if (userPhone != null) {
 			throw new BadRequestException(
