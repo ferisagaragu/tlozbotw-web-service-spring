@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -19,7 +20,11 @@ public class HttpExceptionResponse {
 
 	public ResponseEntity<Object> error(ResponseStatusException e) {
 		Map<String, Object> response = new LinkedHashMap<>();
-		response.put("timestamp", new Date());
+		response.put("timestamp",
+			new SimpleDateFormat(
+				"MM-dd-yyyy  HH:mm:ss a"
+			).format(new Date())
+		);
 		response.put("status", e.getStatus().value());
 		response.put("error", e.getStatus());
 		response.put("message", e.getReason());

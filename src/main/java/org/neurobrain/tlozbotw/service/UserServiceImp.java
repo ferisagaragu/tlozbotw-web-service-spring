@@ -61,8 +61,8 @@ public class UserServiceImp implements IUserService {
 
 	@Override
 	@Transactional(readOnly = true)
-	public ResponseEntity<Object> getAllUsers() {
-		List<User> users = userDao.findAll();
+	public ResponseEntity<Object> getAllUsers(Long adminId) {
+		List<User> users = userDao.findAllUsers(adminId);
 		return response.getAllUsersResp(users);
 	}
 
@@ -166,7 +166,7 @@ public class UserServiceImp implements IUserService {
 		userDao.saveAndFlush(userDelete);
 		sendMailDelete(userDelete);
 
-		return response.deleteResp("Usuario eliminado con exitosamente");
+		return response.deleteResp("Usuario eliminado exitosamente");
 	}
 
 

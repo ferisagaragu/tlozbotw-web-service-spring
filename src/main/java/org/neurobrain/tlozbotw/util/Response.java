@@ -8,6 +8,7 @@ import java.sql.Blob;
 import java.sql.Clob;
 import java.sql.Time;
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Currency;
@@ -143,7 +144,11 @@ public class Response {
 
 	private ResponseEntity<Object> response(String message, Object data, HttpStatus status) {
 		Map<String, Object> response = new LinkedHashMap<>();
-		response.put("timestamp", new Date());
+		response.put("timestamp",
+			new SimpleDateFormat(
+				"MM-dd-yyyy  HH:mm:ss a"
+			).format(new Date())
+		);
 		response.put("status", status.value());
 
 		if (message != null) {
@@ -190,7 +195,7 @@ public class Response {
 			return true;
 		} else if (field.getType().equals(Time.class)) {
 			return true;
-		} else if (field.getType().equals(java.sql.Date.class)) {
+		} else if (field.getType().equals(java.sql.Date.class) || field.getType().equals(Date.class)) {
 			return true;
 		} else if (field.getType().equals(Calendar.class)) {
 			return true;

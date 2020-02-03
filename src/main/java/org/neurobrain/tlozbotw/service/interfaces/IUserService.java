@@ -5,7 +5,7 @@ import org.springframework.http.ResponseEntity;
 
 public interface IUserService {
 	ResponseEntity<Object> getUser(Long id);
-	ResponseEntity<Object> getAllUsers();
+	ResponseEntity<Object> getAllUsers(Long adminId);
 	ResponseEntity<Object> firstSignIn(Long id, Request<String, Object> req);
 	ResponseEntity<Object> update(Long id, Request<String, Object> req);
 	ResponseEntity<Object> lock(Long id, Request<String, Object> req);

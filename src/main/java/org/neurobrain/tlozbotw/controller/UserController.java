@@ -105,8 +105,10 @@ public class UserController {
 	 	@apiGroup User
 		@apiVersion 0.0.1
 		@apiDescription Servicio para obtener todos los usuarios
-		@api {get} user get-all-users
+		@api {get} user/get-all/:adminId get-all-users
 		@apiPermission {admin}
+
+		@apiParam {number} adminId Identificador único del usuario administrador que consume el servicio
 
 		@apiSuccessExample {json} HTTP/1.1 200 OK
 			{
@@ -154,11 +156,11 @@ public class UserController {
 				"message": "your error message"
 			}
 	*/
-	@GetMapping
+	@GetMapping("/get-all/{adminId}")
 	@PreAuthorize("hasRole('ADMIN')")
-	public ResponseEntity<Object> getAllUsers() {
+	public ResponseEntity<Object> getAllUsers(@PathVariable("adminId") Long adminId) {
 		try {
-			return userService.getAllUsers();
+			return userService.getAllUsers(adminId);
 		} catch (ResponseStatusException e) {
 			return httpExceptionResponse.error(e);
 		}
@@ -303,7 +305,7 @@ public class UserController {
 		@api {put} user/lock/:id lock
 		@apiPermission {admin}
 
-		@apiParam {number} Id Identificador único
+		@apiParam {number} Id Identificador único del usuario que bloqueador
 
 		@apiParamExample {json} Request-Body:
 			{
@@ -400,7 +402,7 @@ public class UserController {
 			}
 	*/
 	@DeleteMapping("/{id}")
-	@PreAuthorize("hasRole('ADMIN')")
+	@PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
 	public ResponseEntity<Object> delete(
 		@PathVariable("id") Long id
 	) {
